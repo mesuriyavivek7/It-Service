@@ -24,7 +24,7 @@ export const createUser = async (req, res, next)=>{
 
         await newLoginMap.save()
 
-        return res.status(200).json({message:"New user created successfully.",status:200})
+        return res.status(200).json({message:"New user created successfully.",data:newUser,status:200})
     }catch(err){
         next(err)
     }
@@ -33,11 +33,15 @@ export const createUser = async (req, res, next)=>{
 //For update user by id
 export const updateUser = async (req, res, next)=>{
     try{
+       if(!req.mongoid){
+            return res.status(400).json({ message: "Unauthorized request: Missing user ID", status: 400 });
+       }
+
        const updateUser = await USER.findByIdAndUpdate(req.mongoid,{$set:{...req.body}},{new:true})
 
        if(!updateUser) return res.status(404).json({message:"User not found",status:404})
 
-       return res.status(200).json({status:200,message:"User details updated successfully."})
+       return res.status(200).json({status:200,data:updateUser,message:"User details updated successfully."})
     }catch(err){
         next(err)
     }
@@ -46,6 +50,10 @@ export const updateUser = async (req, res, next)=>{
 //For get user by id
 export const getUser = async (req, res, next) =>{
     try{
+        if(!req.mongoid){
+            return res.status(400).json({ message: "Unauthorized request: Missing user ID", status: 400 });
+        }
+
         const user = await USER.findById(req.mongoid)
 
         if(!user) return res.status(404).json({message:"User not found",status:404})
@@ -59,7 +67,7 @@ export const getUser = async (req, res, next) =>{
 //For get all user
 export const getAllUser = async (req, res, next) =>{
     try{
-        const users = await USER.findById(req.mongoid)
+        const users = await USER.find()
 
         return res.status(200).json({message:"All users retrived.",data:users,status:200})
     }catch(err){

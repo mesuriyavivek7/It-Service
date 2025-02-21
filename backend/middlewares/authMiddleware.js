@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt, { decode } from 'jsonwebtoken'
 import dotenv from 'dotenv'
 
 dotenv.config()
@@ -14,6 +14,7 @@ export const verifyToken = async (req, res, next)=>{
         const decoded = jwt.verify(token,process.env.JWT)
 
         req.mongoid = decoded.mongoid
+        req.userType = decoded.userType
         next()
      }catch(err){
         return res.status(400).json({message:"Invalid token",status:400})

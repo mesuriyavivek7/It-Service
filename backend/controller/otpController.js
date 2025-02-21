@@ -24,7 +24,7 @@ export const sendOtp = async (req, res, next) =>{
 
         if(!mobileno) return res.status(400).json({message:"Please provide mobile number",status:400})
 
-        const existuser =  LOGINMAPPING.findOne({mobileno})
+        const existuser = await LOGINMAPPING.findOne({mobileno})
         
         if(!existuser) return res.status(404).json({message:"User not found.",status:404})
 
@@ -75,11 +75,11 @@ export const verifyOtp = async (req, res, next) =>{
 
        await OTP.findOneAndDelete({mobileno})
 
-       const token = jwt.sign({mongoid:user.mongoid}, process.env.JWT,{
+       const token = jwt.sign({mongoid:user.mongoid,userType:user.userType}, process.env.JWT,{
         expiresIn: "365d", // Lifetime token (1 year)
        })
 
-       return res.status(200).json({message:"Otp verified and Login successfully.",data:{token,userId:user.mongoid},status:200})
+       return res.status(200).json({message:"Otp verified and Login successfully.",data:{token,userId:user.mongoid,userType:user.userType},status:200})
 
     }catch(err){
         next(err)

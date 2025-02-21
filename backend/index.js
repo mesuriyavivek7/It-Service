@@ -15,6 +15,8 @@ const __dirname = path.dirname(__filename);
 // For importing routes
 import userRoute from './routes/user.js'
 import otpRoute from './routes/otp.js'
+import addressRoute from './routes/address.js'
+import deviceRoute from './routes/device.js'
 
 
 // App configuration
@@ -85,7 +87,8 @@ mongoose.connection.on("disconnected", () => {
 // Middleware
 app.use('/api/otp',otpRoute)
 app.use('/api/user',userRoute)
-
+app.use('/api/device',deviceRoute)
+app.use('/api/address',addressRoute)
 
 
 // Middleware to catch errors
