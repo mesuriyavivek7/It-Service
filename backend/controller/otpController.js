@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import twilio from 'twilio'
 import jwt from 'jsonwebtoken'
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
+import USER from "../model/USER.js";
 
 
 //Configure dotenv
@@ -30,11 +31,11 @@ export const sendOtp = async (req, res, next) =>{
 
         const otp = generateOTP()
 
-        // const message = await client.messages.create({
-        //     body: `Your verification code is: ${otp}`,
-        //     from: process.env.TWILIO_PHONE_NUMBER,
-        //     to: mobileno
-        // });
+        const message = await client.messages.create({
+            body: `Your verification code is: ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: mobileno
+        });
 
         let newOtp = new OTP({
             mobileno,
@@ -45,7 +46,7 @@ export const sendOtp = async (req, res, next) =>{
 
         let response = {
             otp,
-            // sid:message.sid
+            sid:message.sid
         }
 
         return res.status(200).json({message:"Otp sended successfully",data:response,status:200})
@@ -80,6 +81,84 @@ export const verifyOtp = async (req, res, next) =>{
        })
 
        return res.status(200).json({message:"Otp verified and Login successfully.",data:{token,userId:user.mongoid,userType:user.userType},status:200})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+
+//Send otp for sign up user
+export const sendOtpForCreateUser = async (req, res, next)=>{
+    try{
+        const {name, mobileno} = req.body
+        if(!name || !mobileno) return res.status(400).json({message:"Please provide all required fields.",status:400})
+
+        const existUser = await LOGINMAPPING.findOne({mobileno})
+
+        if(existUser) return res.status(409).json({message:"User is already exist with same mobileno.",status:409})
+
+        const otp = generateOTP()
+
+        const message = await client.messages.create({
+            body: `Your verification code is: ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: mobileno
+        });
+
+
+        let newOtp = new OTP({
+            name,
+            mobileno,
+            otp
+        })
+
+        await newOtp.save()
+
+        return res.status(200).json({message:"Otp Sended for register new user successfully",data:{otp,sid:message.sid},status:200})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+//Verify otp for sign up user
+export const verifyOtpForCreateUser = async (req, res, next)=>{
+    try{
+        const {mobileno,otp} = req.body
+
+        if(!mobileno || !otp) return res.status(400).json({message:"Please provide all required fields.",status:400})
+
+        const dbotp = await OTP.findOne({mobileno})
+
+        if(!dbotp) return res.status(400).json({message:"OTP has expired. Please request a new one.",data:false,status:400})
+
+        if(dbotp.otp!==otp) return res.status(400).json({message:"Invalid OTP. Please try again.",data:false,status:400})
+
+        await OTP.findOneAndDelete({mobileno})
+
+        let name = dbotp.name
+        
+        const newUser = new USER({
+            name,
+            mobileno
+        })
+
+        await newUser.save()
+
+        const newLoginMap = new LOGINMAPPING({
+            mobileno,
+            userType:'user',
+            mongoid:newUser._id
+        })
+
+        await newLoginMap.save()
+
+        const token = jwt.sign({mongoid:newUser._id,userType:'user'}, process.env.JWT,{
+            expiresIn: "365d", // Lifetime token (1 year)
+        })
+
+        return res.status(200).json({message:"New user created successfully",data:{token,userId:newUser._id,userType:'user'},status:200})
 
     }catch(err){
         next(err)

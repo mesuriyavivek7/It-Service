@@ -9,6 +9,9 @@ const otpSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    name:{
+        type:String,
+    },
     createdAt: { type: Date, default: Date.now, expires: 90 } 
 },{timestamps:true})
 

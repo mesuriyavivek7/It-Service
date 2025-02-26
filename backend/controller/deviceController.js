@@ -56,33 +56,41 @@ export const getAllDevice = async (req, res, next) =>{
 //For updated device by user
 export const updateDevice = async (req, res, next) =>{
     try{
+        const { deviceId } = req.params
+
+        if(!deviceId) return res.status(400).json({message:"Please provide device id",status:400})
+
         const {mongoid} = req
 
         if(!mongoid){
             return res.status(400).json({ message: "Unauthorized request: Missing user ID or user Type", status: 400 });
         }
 
-        const updatedDevice = await DEVICE.findOneAndUpdate({added_by:mongoid},{$set:{...req.body}},{new:true})
+        const updatedDevice = await DEVICE.findOneAndUpdate({_id:deviceId,added_by:mongoid},{$set:{...req.body}},{new:true,runValidators:true})
 
         if(!updatedDevice) return res.status(404).json({message:'Device not found.',status:404})
        
         return res.status(200).json({message:"Device updated successfully",data:updatedDevice,status:200})
 
     }catch(err){
-
+        next(err)
     }
 }
 
 //For delete device by user
 export const deleteDevice = async (req, res, next) =>{
     try{
+        const { deviceId } = req.params
+        
+        if(!deviceId) return res.status(400).json({message:"Please provide device id.",status:400})
+        
         const {mongoid} = req
 
         if(!mongoid){
             return res.status(400).json({ message: "Unauthorized request: Missing user ID or user Type.", status: 400 });
         }
 
-        const deletedDevice = await DEVICE.findOneAndDelete({added_by:mongoid})
+        const deletedDevice = await DEVICE.findOneAndDelete({_id:deviceId,added_by:mongoid})
 
         if(!deletedDevice) return res.status(404).json({message:"Device not found.",status:404})
 

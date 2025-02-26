@@ -12,10 +12,10 @@ app.post('/',verifyToken,createAddress)
 app.get('/',verifyToken,getAllAddress)
 
 //For update address
-app.put('/',verifyToken,updateAddress)
+app.put('/:addressId',verifyToken,updateAddress)
 
 //For delete address
-app.delete('/',verifyToken,deleteAddress)
+app.delete('/:addressId',verifyToken,deleteAddress)
 
 
 export default app

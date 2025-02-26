@@ -12,10 +12,10 @@ app.post('/',verifyToken,createDevice)
 app.get('/',verifyToken,getAllDevice)
 
 //for update device by user
-app.put('/',verifyToken,updateDevice)
+app.put('/:deviceId',verifyToken,updateDevice)
 
 //for delete device by user
-app.delete('/',verifyToken,deleteDevice)
+app.delete('/:deviceId',verifyToken,deleteDevice)
 
 
 export default app
