@@ -25,7 +25,7 @@ const addressSchema = new mongoose.Schema({
    added_by:{
       type:mongoose.Schema.Types.ObjectId,
       required:true,
-      refPath:"user"
+      refPath:"added_by_model"
    },
    added_by_model: {
       type: String,

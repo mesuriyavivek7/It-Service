@@ -17,7 +17,9 @@ import userRoute from './routes/user.js'
 import otpRoute from './routes/otp.js'
 import addressRoute from './routes/address.js'
 import deviceRoute from './routes/device.js'
-
+import adminRoute from './routes/admin.js'
+import authRoute from './routes/auth.js'
+import serviceRoute from './routes/service.js'
 
 // App configuration
 const port = process.env.PORT || 8080;
@@ -89,6 +91,9 @@ app.use('/api/otp',otpRoute)
 app.use('/api/user',userRoute)
 app.use('/api/device',deviceRoute)
 app.use('/api/address',addressRoute)
+app.use('/api/admin',adminRoute)
+app.use('/api/auth',authRoute)
+app.use('/api/service',serviceRoute)
 
 
 // Middleware to catch errors

@@ -19,5 +19,15 @@ export const verifyToken = async (req, res, next)=>{
      }catch(err){
         return res.status(400).json({message:"Invalid token",status:400})
      }
+}
 
+
+export const verifyAdmin = async (req, res, next) =>{
+   const { userType } = req
+
+   if(userType==='admin'){
+      next()
+   }else{
+      return res.status(400).json({message:"Invalid user type.",status:400})
+   }
 }

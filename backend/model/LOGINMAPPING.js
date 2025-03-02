@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import validator from "validator";
 
 const loginmappingSchema = new mongoose.Schema({
     mongoid:{
@@ -7,8 +8,15 @@ const loginmappingSchema = new mongoose.Schema({
         refPath:"userType"
     },
     mobileno:{
-        type:String,
-        required:true,
+        type: String,
+        required: true,
+        unique: true,
+        validate: {
+            validator: function (value) {
+                return validator.isMobilePhone(value, "any", { strictMode: true });
+            },
+            message: "Invalid mobile number format.",
+        },
     },
     email:{
        type:String
