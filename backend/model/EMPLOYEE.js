@@ -19,6 +19,10 @@ const employeeSchema = new mongoose.Schema({
             message: "Invalid email format. Please enter a valid email."
         }
     },
+    availability:{
+        type: Boolean, 
+        default: true
+    },
     mobileno: {
         type: String,
         required: true,
@@ -29,6 +33,12 @@ const employeeSchema = new mongoose.Schema({
             },
             message: "Invalid mobile number format. Please enter a valid mobile number."
         }
+    },
+    assignedIssues: [{ type: mongoose.Schema.Types.ObjectId, ref: "issue" }],
+    added_by:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'admin',
+        required:true
     }
 }, { timestamps: true });
 

@@ -37,9 +37,21 @@ export const updateUser = async (req, res, next)=>{
             return res.status(400).json({ message: "Unauthorized request: Missing user ID", status: 400 });
        }
 
+       const {mobileno} = req.body
+
+       if(mobileno){
+          const existUser = await LOGINMAPPING.findOne({mobileno})
+
+          if(existUser) return res.status(409).json({message:"User is alredy exist with same mobile no.",status:400})
+       }
+
        const updateUser = await USER.findByIdAndUpdate(req.mongoid,{$set:{...req.body}},{new:true})
 
        if(!updateUser) return res.status(404).json({message:"User not found",status:404})
+
+       if(mobileno){
+        await LOGINMAPPING.findOneAndUpdate({mongoid},{$set:{mobileno}})
+       }
 
        return res.status(200).json({status:200,data:updateUser,message:"User details updated successfully."})
     }catch(err){

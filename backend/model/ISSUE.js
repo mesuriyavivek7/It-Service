@@ -30,8 +30,12 @@ const issueSchema = new mongoose.Schema({
        type:String
     },
     time:{
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'time',
         required:true
+    },
+    time_snapshots:{
+       type:String
     },
     date:{
         type:Date,
@@ -41,6 +45,9 @@ const issueSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'user',
         required:true
+    },
+    user_snapshots:{
+        type:String
     },
     status:{
         type:String,
@@ -55,6 +62,11 @@ const issueSchema = new mongoose.Schema({
     service_snapshots:{
         service_name:String,
         price:Number
+    },
+    assignedEmployee: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: "employee", 
+        default: null 
     }
 },{timestamps:true})
 

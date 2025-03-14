@@ -20,6 +20,10 @@ import deviceRoute from './routes/device.js'
 import adminRoute from './routes/admin.js'
 import authRoute from './routes/auth.js'
 import serviceRoute from './routes/service.js'
+import issueRoute from './routes/issue.js'
+import employeeRoute from './routes/employee.js'
+import timeRoute from './routes/time.js'
+import leaveRoute from './routes/leave.js'
 
 // App configuration
 const port = process.env.PORT || 8080;
@@ -94,7 +98,10 @@ app.use('/api/address',addressRoute)
 app.use('/api/admin',adminRoute)
 app.use('/api/auth',authRoute)
 app.use('/api/service',serviceRoute)
-
+app.use('/api/issue',issueRoute)
+app.use('/api/employee',employeeRoute)
+app.use('/api/time',timeRoute)
+app.use('/api/leave',leaveRoute)
 
 // Middleware to catch errors
 app.use((err, req, res, next) => {
