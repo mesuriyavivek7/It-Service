@@ -47,6 +47,8 @@ export const sendOtp = async (req, res, next) =>{
         let response = {
             otp,
             // sid:message.sid
+            mobileno,
+
         }
 
         return res.status(200).json({message:"Otp sended successfully",data:response,status:200})
@@ -115,7 +117,7 @@ export const sendOtpForCreateUser = async (req, res, next)=>{
 
         await newOtp.save()
 
-        return res.status(200).json({message:"Otp Sended for register new user successfully",data:{otp},status:200})
+        return res.status(200).json({message:"Otp Sended for register new user successfully",data:{otp,mobileno,name},status:200})
 
     }catch(err){
         next(err)
