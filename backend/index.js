@@ -33,10 +33,7 @@ dotenv.config();
 const app = express();
 
 // Serve static files from the uploads directory
-// app.use(
-//   "/uploads/partner/logo",
-//   express.static(path.join(__dirname, "uploads/partner/logo"))
-// );
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 const corsOptions = {
