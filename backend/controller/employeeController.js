@@ -1,6 +1,7 @@
 import EMPLOYEE from "../model/EMPLOYEE.js";
 import ISSUE from "../model/ISSUE.js";
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
+import LEAVE from "../model/LEAVE.js";
 import bcrypt from 'bcryptjs'
 
 export const createNewEmployee = async (req, res, next) =>{
@@ -213,12 +214,27 @@ export const checkAvailibiltyOfEmployee = async (req, res, next) => {
     if (issue.assignedEmployee)
       return res.status(400).json({ message: "Employee is already assigned to this issue.", status: 400 });
 
+    const issueDateStart = new Date(issueDate);
+    issueDateStart.setHours(0, 0, 0, 0);
+
+    const issueDateEnd = new Date(issueDate);
+    issueDateEnd.setHours(23, 59, 59, 999);
+
     // Fetch all employees
     const employees = await EMPLOYEE.find({ availability: true });
 
     // Filter available employees
     const availableEmployees = await Promise.all(
       employees.map(async (emp) => {
+        const leaveExists = await LEAVE.findOne({
+          added_by: emp._id,
+          status: "Approved",
+          from: { $lte: issueDateEnd }, 
+          to: { $gte: issueDateStart },
+        });
+
+        if (leaveExists) return null;
+
         if (emp.assignedIssues.length === 0) return emp; // If no assigned issues, employee is available
 
         const existIssue = await ISSUE.find({

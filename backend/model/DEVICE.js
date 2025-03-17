@@ -22,7 +22,6 @@ const deviceSchema = new mongoose.Schema({
     type: String,
     required: [true, "Serial number is required"],
     trim: true,
-    unique: true, // Ensures no duplicate serial numbers
     match: [/^[a-zA-Z0-9-]+$/, "Serial number should contain only letters, numbers, and hyphens"],
   },
   added_by: {
