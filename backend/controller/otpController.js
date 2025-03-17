@@ -4,6 +4,7 @@ import twilio from 'twilio'
 import jwt from 'jsonwebtoken'
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
 import USER from "../model/USER.js";
+import EMPLOYEE from "../model/EMPLOYEE.js";
 
 
 //Configure dotenv
@@ -67,6 +68,13 @@ export const verifyOtp = async (req, res, next) =>{
 
     try{
        const user = await LOGINMAPPING.findOne({mobileno})
+
+       let existUser = null
+       if(user.userType==='user'){
+          existUser = await USER.findOne({mobileno})
+       }else if(user.userType==='employee'){
+          existUser = await EMPLOYEE.findOne({mobileno})         
+       }
        
        if(!user) return res.status(404).json({message:"User not found.",status:404})
        
@@ -82,7 +90,7 @@ export const verifyOtp = async (req, res, next) =>{
         expiresIn: "365d", // Lifetime token (1 year)
        })
 
-       return res.status(200).json({message:"Otp verified and Login successfully.",data:{token,userId:user.mongoid,userType:user.userType},status:200})
+       return res.status(200).json({message:"Otp verified and Login successfully.",data:{token,userId:user.mongoid,mobileno,name:existUser.name,userType:user.userType},status:200})
 
     }catch(err){
         next(err)
@@ -160,7 +168,7 @@ export const verifyOtpForCreateUser = async (req, res, next)=>{
             expiresIn: "365d", // Lifetime token (1 year)
         })
 
-        return res.status(200).json({message:"New user created successfully",data:{token,userId:newUser._id,userType:'user'},status:200})
+        return res.status(200).json({message:"New user created successfully",data:{token,name,mobileno,userId:newUser._id,userType:'user'},status:200})
 
     }catch(err){
         next(err)
