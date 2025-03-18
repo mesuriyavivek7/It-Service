@@ -4,7 +4,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const verifyToken = async (req, res, next)=>{
-     const token = req.header("Authorization");
+     const token = req.header("Authorization") || req.cookies.it_token;
 
      if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." ,status:401});

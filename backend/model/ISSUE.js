@@ -24,7 +24,6 @@ const issueSchema = new mongoose.Schema({
     address:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'address',
-        required:true
     },
     address_snapshots:{
        type:String

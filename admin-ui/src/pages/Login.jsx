@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useDispatch } from 'react-redux';
+import { loginStart, loginFailure, loginSuccess } from '../redux/action/authAction';
+import api from '../api';
 
 //Importing icons
-import { Eye } from 'lucide-react';
+import { AppleIcon, Eye } from 'lucide-react';
 import { EyeOff } from 'lucide-react';
 
 const Login = () => {
@@ -10,6 +13,7 @@ const Login = () => {
     email:'',
     password:''
   })
+  const dispatch = useDispatch()
 
   const [errors,setErrors] = useState({})
   const [loading,setLoading] = useState(false)
@@ -21,29 +25,66 @@ const Login = () => {
      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
      if(!formData.email) newErrors.email="Email address is required."
-     else if(emailRegex.test(formData.email)) newErrors.email='Invalid email address.'
-     if(formData.password) newErrors.password="Password is required."
+     else if(!emailRegex.test(formData.email)) newErrors.email='Invalid email address.'
+     if(!formData.password) newErrors.password="Password is required."
      
      setErrors(newErrors)
 
      return Object.keys(newErrors).length === 0
   }
 
-  const handleChange = (e) =>{
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-      const {name,value} = e.target
-
-      if(name==="email" && !value) setErrors((prevData)=>({...prevData,[name]:"Email address is required."}))
-      else if(name==="email" && !emailRegex.test(value)) setErrors((prevData)=>({...prevData,[name]:"Invlaid email address."}))
-      else{
-        const {email,...other} = errors
-        setErrors(other)
+  
+  const handleChange = (e) => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const { name, value } = e.target;
+  
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  
+    setErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+  
+      if (name === "email") {
+        if (!value) {
+          newErrors.email = "Email address is required.";
+        } else if (!emailRegex.test(value)) {
+          newErrors.email = "Invalid email address.";
+        } else {
+          delete newErrors.email; // Remove email error if valid
+        }
       }
-
-      if(name==="password" && !value) setErrors((prevData)=>({...prevData,[name]:"Password is required."}))
-
-      setFormData((prevData)=>({...prevData,[name]:value}))
-  } 
+  
+      if (name === "password") {
+        if (!value) {
+          newErrors.password = "Password is required.";
+        } else {
+          delete newErrors.password; // Remove password error if valid
+        }
+      }
+  
+      return newErrors;
+    });
+  };
+  
+  const handleSubmit = async (e)=>{
+    e.preventDefault()
+    if(validateData()){
+     setLoading(true)
+     dispatch(loginStart())
+     try{
+        const response = await api.post('/auth/login',formData)
+        console.log(response) 
+        dispatch(loginSuccess(response.data.data))
+     }catch(err){
+       console.log(err)
+       dispatch(loginFailure("Something went wrong while login."))
+     }finally{
+       setLoading(false)
+     }
+   }
+  }
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
@@ -79,11 +120,12 @@ const Login = () => {
           </div>
           
           {/* Login Form */}
-          <form className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
+              <div className='flex flex-col gap-1'>
               <input
                 id="email"
                 name="email"
@@ -93,14 +135,17 @@ const Login = () => {
                 placeholder='admin@example.com'
                 className="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              {errors.email && <span className='text-sm text-red-500'>{errors.email}</span>}
+              </div>
             </div>
             
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
-              <div className="relative">
-                <input
+              <div className='flex flex-col gap-1'>
+               <div className="relative">
+                 <input
                   id="password"
                   name="password"
                   type={showPassword?"text":"password"}
@@ -116,7 +161,10 @@ const Login = () => {
                 >
                   {showPassword?<EyeOff className='w-5 h-5'></EyeOff>:<Eye className='w-5 h-5'></Eye>}
                 </button>
+               </div>
+               {errors.password && <span className='text-sm text-red-500'>{errors.password}</span>}
               </div>
+
             </div>
             
             <div className="text-sm">
@@ -127,6 +175,7 @@ const Login = () => {
             
             <div>
               <button
+                onClick={handleSubmit}
                 type="submit"
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
