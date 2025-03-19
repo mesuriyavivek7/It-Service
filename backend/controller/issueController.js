@@ -3,6 +3,7 @@ import DEVICE from "../model/DEVICE.js";
 import SERVICE from "../model/SERVICE.js";
 import ADDRESS from "../model/ADDRESS.js";
 import EMPLOYEE from "../model/EMPLOYEE.js";
+import TIME from "../model/TIME.js";
 import OTP from "../model/OTP.js";
 import moment from 'moment'
 import dotenv from 'dotenv'
@@ -69,6 +70,12 @@ export const createIssue = async (req, res, next) =>{
 
         if(!checkService) return res.status(404).json({message:"Service is not found.",status:404})
 
+        //Check time exist or not
+        const checkTime = await TIME.findById(time)
+
+        if(!checkTime) return res.status(404).json({message:"Time is not found",status:404})
+
+        
         const newIssue = new ISSUE({
             issue_description,
             device,

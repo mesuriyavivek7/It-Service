@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux'
+import { loginFailure, loginSuccess } from './redux/action/authAction';
 import api from './api';
-
-
 
 //Importing General Components
 import Login from './pages/Login';
@@ -11,7 +10,8 @@ import Login from './pages/Login';
 //Importing Amdin components
 import AdminDashboard from './components/AdminDashboard';
 import MainAdmin from './pages/Admin/MainAdmin';
-import { loginFailure, loginSuccess } from './redux/action/authAction';
+import User from './pages/Admin/User';
+
 
 const ProtectedRoute = ({children, requiredRole}) => {
   const { user } = useSelector((state) => state.auth);
@@ -61,6 +61,7 @@ function App() {
         {/* Admin Routes */}
          <Route path='admin' element={<ProtectedRoute requiredRole="admin"><AdminDashboard></AdminDashboard></ProtectedRoute>}>
            <Route path='dashboard' element={<MainAdmin></MainAdmin>}></Route>
+           <Route path='users' element={<User></User>}></Route>
          </Route>
 
       </Routes>

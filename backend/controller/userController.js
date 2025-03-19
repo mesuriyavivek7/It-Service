@@ -1,6 +1,6 @@
 import USER from "../model/USER.js";
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
-
+import ISSUE from "../model/ISSUE.js";
 
 //For create new user
 export const createUser = async (req, res, next)=>{
@@ -79,9 +79,45 @@ export const getUser = async (req, res, next) =>{
 //For get all user
 export const getAllUser = async (req, res, next) =>{
     try{
-        const users = await USER.find()
+         // Fetch all users
+         const users = await USER.find();
 
-        return res.status(200).json({message:"All users retrived.",data:users,status:200})
+         // Get issue statistics grouped by added_by (user)
+         const issueStats = await ISSUE.aggregate([
+             {
+                 $group: {
+                     _id: "$added_by", // Group by user ID
+                     total_issues: { $sum: 1 },
+                     resolved_issues: { $sum: { $cond: [{ $eq: ["$status", "Resolved"] }, 1, 0] } },
+                     pending_issues: { $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] } },
+                     canceled_issues: { $sum: { $cond: [{ $eq: ["$status", "Canceled"] }, 1, 0] } }
+                 }
+             }
+         ]);
+ 
+         // Convert issueStats array to an object for quick lookup
+         const issueMap = issueStats.reduce((acc, stat) => {
+             acc[stat._id.toString()] = stat;
+             return acc;
+         }, {});
+ 
+         // Attach issue stats to each user
+         const usersWithIssueStats = users.map(user => ({
+             ...user.toObject(),
+             issueStats: issueMap[user._id.toString()] || {
+                 total_issues: 0,
+                 resolved_issues: 0,
+                 pending_issues: 0,
+                 canceled_issues: 0
+             }
+         }));
+ 
+         return res.status(200).json({
+             message: "All users retrieved.",
+             data: usersWithIssueStats,
+             status: 200
+         });
+
     }catch(err){
         next(err)
     }

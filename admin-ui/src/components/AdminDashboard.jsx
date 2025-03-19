@@ -88,7 +88,7 @@ export default function AdminDashboard() {
     <div className="flex w-screen overflow-hidden h-screen bg-white">
 
       {/* Sidebar For Web screen */}
-      <div className={`${isMenuOpen?"w-[18%]":"w-[10%]"} bg-themecolor border z-40 md:block hidden transition-all duration-300 shadow-lg`}>
+      <div className={`${isMenuOpen?"w-[16%]":"w-[6%]"} bg-themecolor z-40 md:block hidden transition-all duration-300 shadow-lg`}>
             <div className="flex h-20 border-bordercolor border-b items-center justify-center">
               <div className="flex items-center gap-3">
                 <img className="w-8 h-8" alt="logo" src={LOGO}></img>
@@ -108,17 +108,35 @@ export default function AdminDashboard() {
                 {isMenuOpen && <span className={`${isActive("users") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Users</span>}
              </div>
             </div>
-
       </div>
 
+      {/* sidebar for mobile screen */}
+        <div ref={sidebarRef} className={`${isMenuOpen?"-left-64":"left-0"} bg-themecolor z-40 w-64 bottom-0 top-0 md:hidden absolute overflow-scroll transition-all duration-300 shadow-lg`}>
+          <div className="flex h-20 border-bordercolor border-b items-center justify-center">
+            <div className="flex items-center gap-2">
+              <img className="w-8 h-8" alt="logo" src={LOGO}></img>
+              <h1 className="text-themeblue text-white text-2xl transition-all duration-300 font-semibold">Duet</h1>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 overflow-scroll">
+             <div className="px-6 py-2">
+               <span className="text-xs text-navtext">MAIN</span>
+             </div>
+            <div onClick={()=>handleNavigate('/admin/dashboard')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('dashboard') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><DashboardOutlinedIcon style={{fontSize:'1.2rem'}}></DashboardOutlinedIcon></span>
+               <span className={`${isActive("dashboard") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Dashboard</span>
+            </div>
+          </div>
+        </div>
+
       {/* Main content */}
-      <div className={`${isMenuOpen?"w-[84%]":"w-[90%]"} h-full w-[80%] relative border flex flex-col`}>
+      <div className={`${isMenuOpen?"md:left-[16%] left-0":"md:left-[6%] left-0"} transition-all duration-300 top-0 right-0 bottom-0 h-full fixed flex flex-col`}>
 
       {/* Navbar */}
-        <div className="flex bg-white z-40 md:h-20 border h-16 justify-between px-2 md:px-8 w-full items-center">
+        <div className="flex bg-white z-40 md:h-22 border-b-shadow shadow h-16 justify-between px-4 md:px-8 w-full items-center">
 
           <div className="flex items-center gap-4">
-            <span onClick={()=>setIsMenuOpen(!isMenuOpen)} className="text-themeblue cursor-pointer">
+            <span onClick={()=>setIsMenuOpen(!isMenuOpen)} className=" font-light cursor-pointer">
               {isMenuOpen ? <MenuIcon style={{ fontSize: "2rem" }}></MenuIcon> : <ArrowRightAltIcon style={{fontSize: "2rem"}}></ArrowRightAltIcon>}
             </span>
             <span className="text-2xl md:block hidden font-bold">{getCurrentPageName()}</span>
@@ -128,24 +146,25 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-4 md:gap-8">
             <div onClick={()=>setIsProfileOpen(!isProfileOpen)} className="relative flex cursor-pointer items-center gap-3">
               <img
-                className="w-12 h-12 rounded-full"
+                className="md:w-12 md:h-12 h-10 w-10 rounded-full"
                 src={PERSON}
                 alt="profile"
               ></img>
 
               <div className="md:flex hidden flex-col">
                 <h4 className="text-base leading-4 font-bold">{getName(user?.firstName)}</h4>
-                <h4 className="text-sm">{user?.isAdmin?"Admin":"Member"}</h4>
+                <h4 className="text-sm">{user?.isAdmin?"Admin":"Employee"}</h4>
               </div>
 
               {isProfileOpen && 
-               <div ref={popupRef} className="absolute z-40 w-36 md:w-48 shadow rounded-md border bg-white top-[120%] right-0 flex flex-col ">
+               <div ref={popupRef} className="absolute z-40 w-30 md:w-40 shadow-md rounded-md bg-white top-[140%] right-0 flex flex-col ">
                  <Link to="/admin/profile"><div className="flex hover:bg-lightgray p-2 items-center gap-2 text-gray-500"><span className="text-blue-500"><AccountCircleIcon></AccountCircleIcon></span> Profile</div></Link>
                  <div onClick={logoutUser} className="flex hover:bg-lightgray p-2 items-center gap-2 text-gray-500"><span className="text-red-500"><LogoutIcon></LogoutIcon></span> Logout</div>
               </div>
               }
             </div>
           </div>
+
       </div>
 
        {/* Outlate */}
@@ -162,10 +181,3 @@ export default function AdminDashboard() {
 
 
 
-        {/* sidebar for mobile screen */}
-        {/* <div ref={sidebarRef} className={`${isMenuOpen?"-left-96":"left-0"} z-40 w-64 bottom-0 top-0 md:hidden absolute overflow-scroll transition-all duration-300 shadow-lg bg-white`}>
-            <div onClick={()=>handleNavigate('/admin')} className={`group flex ${isActive("dashboard") && "bg-blue-50 border-r-2 border-themeblue"} hover:bg-blue-50 py-4 cursor-pointer px-8 items-center gap-2`}>
-               <span className={`${isActive('dashboard') ? "text-themeblue" : "text-gray-700 group-hover:text-themeblue"} `}><DashboardOutlinedIcon style={{fontSize:'1.5rem'}}></DashboardOutlinedIcon></span>
-               <span className={`${isActive("dashboard") && "text-themeblue"} group-hover:text-themeblue font-medium text-lg`}>Dashboard</span>
-            </div>
-        </div> */}
