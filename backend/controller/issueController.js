@@ -53,7 +53,7 @@ export const createIssue = async (req, res, next) =>{
 
         const {issue_description, device, address, time, date, service} = req.body
 
-        if(!issue_description || !device || !address || !time || !date || !service) return res.status(400).json({message:"Please provide all required fields.",status:400})
+        if(!issue_description || !device || !time || !date || !service) return res.status(400).json({message:"Please provide all required fields.",status:400})
 
         //Check device exist or not
         const checkDevice = await DEVICE.findById(device)

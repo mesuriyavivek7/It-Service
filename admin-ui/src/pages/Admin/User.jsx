@@ -1,9 +1,10 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import { toast } from 'react-toastify';
 
 //Importing data
-import { userColumns } from '../../data/userData';
+import { userColumns, fetchUserData } from '../../data/userData';
 
 //Importing icons
 import { Plus } from 'lucide-react';
@@ -13,8 +14,45 @@ import { RefreshCcw } from 'lucide-react';
 
 function User() {
 
+  const [users,setUsers] = useState([])
+  const [filterUsers,setFilterUsers] = useState([])
+  const [loading,setLoading] = useState(false)
+  const [searchQuery,setSearchQuery] = useState('')
+
+  const fetchData = async () =>{
+    try{
+      setLoading(true)
+      const data = await fetchUserData()
+      setUsers(()=>data.map((item)=>({id:item._id,...item})))
+    }catch(err){
+      console.log(err)
+      toast.error(err.response?.data?.message || "Something went wrong.")
+    }finally{
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (searchQuery) {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      const filtered = users.filter(user => 
+        Object.values(user).some(value => 
+          typeof value === 'string' && value.toLowerCase().includes(lowerCaseQuery)
+        )
+      );
+      setFilterUsers(filtered);
+    } else {
+      setFilterUsers(users);
+    }
+  }, [users, searchQuery]);
+  
+
+  useEffect(()=>{
+     fetchData()
+  },[])
+
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex h-full flex-col gap-4'>
 
      <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
         <button className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
@@ -25,23 +63,31 @@ function User() {
         <div className='flex items-center gap-2'>
             <div className='flex border border-grayborder gap-2 rounded-md py-1.5 px-2 items-center'>
                 <Search className='w-5 h-5 text-navtext'></Search>
-                <input className='outline-none placeholder:text-navtext placeholder:text-sm' placeholder='Search User...'></input>
+                <input onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery} className='outline-none placeholder:text-navtext placeholder:text-sm' placeholder='Search User...'></input>
             </div>
-            <div className='py-2 px-2 border-grayborder border rounded-md'>
+            <div onClick={fetchData} className='py-2 px-2 border-grayborder border rounded-md'>
                 <RefreshCcw className='w-5 h-5 cursor-pointer'></RefreshCcw>
             </div>
         </div>
      </div>
 
-     <div className='h-full py-4 px-3 custom-shadow rounded-md bg-white'>
-         <Box sx={{height:"100%",
-          '& .super-app-theme--header': {
-            backgroundColor: '#edf3fd',
-          },}}>
+     <div className='h-full shadow-[0_2px_10px_rgba(0,0,0,0.08)] rounded-md bg-white'>
+          <Box sx={{
+                height: "100%",
+                "& .MuiDataGrid-root": {
+                  border: "none", // Removes the outer border
+                },
+                "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: "#edf3fd",  // Header background color
+                    fontWeight: "bold",  
+                    fontSize:'.9rem'
+                },    
+          }}>
            <DataGrid
-            rows={filteredDoctors}
-            columns={columns(handleOpenUpdateData,handleOpenConfirmPopUp)}
+            rows={filterUsers}
+            columns={userColumns}
             loading={loading}
+            rowHeight={70}
             initialState={{
             pagination: {
               paginationModel: {

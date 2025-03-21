@@ -126,6 +126,10 @@ export default function AdminDashboard() {
                <span className={`${isActive('dashboard') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><DashboardOutlinedIcon style={{fontSize:'1.2rem'}}></DashboardOutlinedIcon></span>
                <span className={`${isActive("dashboard") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Dashboard</span>
             </div>
+            <div onClick={()=>handleNavigate('/admin/users')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('users') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><PeopleOutlinedIcon style={{fontSize:'1.2rem'}}></PeopleOutlinedIcon></span>
+               <span className={`${isActive("users") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Users</span>
+            </div>
           </div>
         </div>
 
