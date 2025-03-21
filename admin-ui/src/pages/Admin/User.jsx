@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import UserForm from '../../components/UserForm';
 import { toast } from 'react-toastify';
 
 //Importing data
@@ -18,6 +19,7 @@ function User() {
   const [filterUsers,setFilterUsers] = useState([])
   const [loading,setLoading] = useState(false)
   const [searchQuery,setSearchQuery] = useState('')
+  const [isOpenUserForm,setIsOpenUserForm] = useState(false)
 
   const fetchData = async () =>{
     try{
@@ -45,7 +47,7 @@ function User() {
       setFilterUsers(users);
     }
   }, [users, searchQuery]);
-  
+
 
   useEffect(()=>{
      fetchData()
@@ -53,9 +55,12 @@ function User() {
 
   return (
     <div className='flex h-full flex-col gap-4'>
-
+     {
+      isOpenUserForm && 
+      <UserForm setIsOpenUserForm={setIsOpenUserForm}></UserForm>
+     }
      <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
-        <button className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
+        <button onClick={()=>setIsOpenUserForm(true)} className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
             <Plus className='w-4 h-4'></Plus>
             <span>Add User</span>
         </button>

@@ -60,11 +60,6 @@ export const createIssue = async (req, res, next) =>{
 
         if(!checkDevice) return res.status(404).json({message:"Device is not found.",status:404})
 
-        //Check address exist or not
-        const checkAddress = await ADDRESS.findById(address)
-
-        if(!checkAddress) return res.status(404).json({message:"Address is not found.",status:404})
-
         //Check Service exist or not
         const checkService = await SERVICE.findById(service)
 
