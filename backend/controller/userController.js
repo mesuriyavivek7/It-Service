@@ -33,27 +33,35 @@ export const createUser = async (req, res, next)=>{
 //For update user by id
 export const updateUser = async (req, res, next)=>{
     try{
-       if(!req.mongoid){
+       const {mongoid} = req 
+
+       if(!mongoid){
             return res.status(400).json({ message: "Unauthorized request: Missing user ID", status: 400 });
        }
 
-       const {mobileno} = req.body
+       const {userId} = req.params
 
-       if(mobileno){
-          const existUser = await LOGINMAPPING.findOne({mobileno})
+       const user = await USER.findById(userId)
 
-          if(existUser) return res.status(409).json({message:"User is alredy exist with same mobile no.",status:400})
+       if(!user) return res.status(404).json({status:404,message:"User not found."})
+
+       const {name, mobileno} = req.body 
+
+       if(mobileno!==user.mobileno){
+
+        const existUser = await LOGINMAPPING.findOne({mobileno})
+
+        if(existUser) return res.status(409).json({message:"User is already exist with same mobileno.",status:409})
+
+        await LOGINMAPPING.findOneAndUpdate({mongoid:userId},{$set:{mobileno}})
+
        }
 
-       const updateUser = await USER.findByIdAndUpdate(req.mongoid,{$set:{...req.body}},{new:true})
+       const updatedUser = await USER.findByIdAndUpdate(userId,{$set:{name,mobileno}},{new:true})
 
-       if(!updateUser) return res.status(404).json({message:"User not found",status:404})
+       
+       return res.status(200).json({status:200,data:updatedUser,message:"User details updated successfully."})
 
-       if(mobileno){
-        await LOGINMAPPING.findOneAndUpdate({mongoid},{$set:{mobileno}})
-       }
-
-       return res.status(200).json({status:200,data:updateUser,message:"User details updated successfully."})
     }catch(err){
         next(err)
     }
@@ -137,3 +145,4 @@ export const deleteUser = async (req, res, next) =>{
         next(err)
     }
 }
+

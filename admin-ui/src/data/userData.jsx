@@ -1,4 +1,6 @@
 import api from "../api";
+import Tooltip from "@mui/material/Tooltip";
+
 
 const formatDate= (timestamp) => {
     const date = new Date(timestamp);
@@ -16,7 +18,11 @@ import CHECKED from '../assets/checked.png'
 import PENDING from '../assets/clock.png'
 import CLOSE from '../assets/button.png'
 
-export const userColumns = [
+//Importing icons
+import { Pencil } from 'lucide-react';
+
+
+export const userColumns = (handleOpenEditUser) => [
     {
         field: 'name',
         headerClassName: 'super-app-theme--header',
@@ -119,6 +125,22 @@ export const userColumns = [
             <span>{formatDate(params.value)}</span>
         )
     },
+    {
+      field: 'aciton',
+      headerClassName: 'super-app-theme--header',
+      headerName: 'Action',
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) =>(
+        <div className="flex items-center justify-center w-full h-full gap-2">
+           <Tooltip title='Edit' arrow>
+           <div onClick={()=>handleOpenEditUser(params.row)} className="bg-green-600 w-7 h-7 cursor-pointer rounded-full flex justify-center items-center">
+             <Pencil data-tooltip-content="Edit" className="text-white w-4 h-4"></Pencil>
+            </div>
+          </Tooltip>
+        </div>
+      )
+    }
 ]
 
 export const fetchUserData = async ()=>{

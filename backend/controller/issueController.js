@@ -271,7 +271,7 @@ export const verifyResolveIssue = async (req, res, next) =>{
 
        await EMPLOYEE.findByIdAndUpdate(issue.assignedEmployee,{$pull:{assignedIssues:issueId}})
 
-       await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
+    //    await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
 
        return res.status(200).json({message:"Service resolved successfully.",status:200})
 

@@ -11,6 +11,7 @@ import Login from './pages/Login';
 import AdminDashboard from './components/AdminDashboard';
 import MainAdmin from './pages/Admin/MainAdmin';
 import User from './pages/Admin/User';
+import Employee from './pages/Admin/Employee';
 
 
 const ProtectedRoute = ({children, requiredRole}) => {
@@ -62,6 +63,7 @@ function App() {
          <Route path='admin' element={<ProtectedRoute requiredRole="admin"><AdminDashboard></AdminDashboard></ProtectedRoute>}>
            <Route path='dashboard' element={<MainAdmin></MainAdmin>}></Route>
            <Route path='users' element={<User></User>}></Route>
+           <Route path='employee' element={<Employee></Employee>}></Route>
          </Route>
 
       </Routes>

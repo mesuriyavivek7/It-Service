@@ -1,5 +1,5 @@
 import express from 'express'
-import { assignEmployeeToIssue, checkAvailibiltyOfEmployee, createNewEmployee, getAllEmployee, getIssuesByEmployeeId, getOneEmployee, removeEmployeeFromIssue, updateEmployee } from '../controller/employeeController.js'
+import { assignEmployeeToIssue, checkAvailibiltyOfEmployee, createNewEmployee, getAllEmployee, getIssuesByEmployeeId, getOneEmployee, removeEmployeeFromIssue, updateEmployee, updateEmployeeFromAdmin } from '../controller/employeeController.js'
 import { verifyToken, verifyAdmin } from '../middlewares/authMiddleware.js'
 
 const app = express.Router()
@@ -29,5 +29,7 @@ app.post('/getAvailableEmployees/:issueId',verifyToken,verifyAdmin,checkAvailibi
 //For get issues of eny employee
 app.get('/getissues/:empId',verifyToken,getIssuesByEmployeeId)
 
+//For Update employee details from admin
+app.put('/:empId',verifyToken,verifyAdmin,updateEmployeeFromAdmin)
 
 export default app

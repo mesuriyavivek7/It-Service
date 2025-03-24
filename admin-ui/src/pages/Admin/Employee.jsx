@@ -1,86 +1,85 @@
-import React, { useEffect, useState } from 'react'
-import { DataGrid } from '@mui/x-data-grid';
-import Box from '@mui/material/Box';
-import UserForm from '../../components/UserForm';
-import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import Box from "@mui/material/Box";
+import EmployeeForm from "../../components/EmployeeForm";
+import { toast } from "react-toastify";
 
 //Importing data
-import { userColumns, fetchUserData } from '../../data/userData';
+import { employeeColumns, fetchEmployeeData } from "../../data/employeeData";
 
 //Importing icons
-import { Plus } from 'lucide-react';
-import { Search } from 'lucide-react';
-import { RefreshCcw } from 'lucide-react';
+import { Plus } from "lucide-react";
+import { Search } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 
+function Employee() {
+  const [employee, setEmployee] = useState([]);
+  const [filterEmployee, setFilterEmployee] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isOpenUserForm, setIsOpenUserForm] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-function User() {
-
-  const [users,setUsers] = useState([])
-  const [filterUsers,setFilterUsers] = useState([])
-  const [loading,setLoading] = useState(false)
-  const [searchQuery,setSearchQuery] = useState('')
-  const [isOpenUserForm,setIsOpenUserForm] = useState(false)
-  const [selectedUser,setSelectedUser] = useState(null)
-
-  const fetchData = async () =>{
-    try{
-      setLoading(true)
-      const data = await fetchUserData()
-      setUsers(()=>data.map((item)=>({id:item._id,...item})))
-    }catch(err){
-      console.log(err)
-      toast.error(err.response?.data?.message || "Something went wrong.")
-    }finally{
-      setLoading(false)
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchEmployeeData();
+      setEmployee(() => data.map((item) => ({ id: item._id, ...item })));
+    } catch (err) {
+      console.log(err);
+      toast.error(err?.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (searchQuery) {
       const lowerCaseQuery = searchQuery.toLowerCase();
-      const filtered = users.filter(user => 
-        Object.values(user).some(value => 
-          typeof value === 'string' && value.toLowerCase().includes(lowerCaseQuery)
+      const filtered = employee.filter((user) =>
+        Object.values(user).some(
+          (value) =>
+            typeof value === "string" &&
+            value.toLowerCase().includes(lowerCaseQuery)
         )
       );
-      setFilterUsers(filtered);
+      setFilterEmployee(filtered);
     } else {
-      setFilterUsers(users);
+      setFilterEmployee(employee);
     }
-  }, [users, searchQuery]);
+  }, [employee, searchQuery]);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  useEffect(()=>{
-     fetchData()
-  },[])
+  const handleOpenEditUser = (data) => {
+    if (data) {
+      setSelectedUser(data);
+      setIsOpenUserForm(true);
+    }
+  };
 
-  const handleOpenEditUser= (data) =>{
-       if(data){
-        setSelectedUser(data)
-        setIsOpenUserForm(true)
-       }
-  }
+  const handleCloseEditUser = () => {
+    setSelectedUser(null);
+  };
 
-  const handleCloseEditUser = () =>{
-      setSelectedUser(null)
-  }
-
-  useEffect(()=>{
-     if(!isOpenUserForm){
-        handleCloseEditUser()
-     }
-  },[isOpenUserForm])
+  useEffect(() => {
+    if (!isOpenUserForm) {
+      handleCloseEditUser();
+    }
+  }, [isOpenUserForm]);
 
   return (
     <div className='flex h-full flex-col gap-4'>
      {
       isOpenUserForm && 
-      <UserForm user={selectedUser} setIsOpenUserForm={setIsOpenUserForm} fetchData={fetchData}></UserForm>
+      <EmployeeForm user={selectedUser} setIsOpenUserForm={setIsOpenUserForm} fetchData={fetchData}></EmployeeForm>
      }
      <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
         <button onClick={()=>setIsOpenUserForm(true)} className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
             <Plus className='w-4 h-4'></Plus>
-            <span>Add User</span>
+            <span>Add Employee</span>
         </button>
 
         <div className='flex items-center gap-2'>
@@ -107,8 +106,8 @@ function User() {
                 },    
           }}>
            <DataGrid
-            rows={filterUsers}
-            columns={userColumns(handleOpenEditUser)}
+            rows={filterEmployee}
+            columns={employeeColumns(handleOpenEditUser)}
             loading={loading}
             rowHeight={70}
             initialState={{
@@ -126,7 +125,7 @@ function User() {
      
 
     </div>
-  )
+  );
 }
 
-export default User
+export default Employee;

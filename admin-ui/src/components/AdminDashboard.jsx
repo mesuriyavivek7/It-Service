@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 //Importing components
@@ -18,14 +18,33 @@ import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
+
+import api from "../api";
+import { toast } from "react-toastify";
 
 
 
 export default function AdminDashboard() {
   const { user } = useSelector((state) => state.auth);
+  const [userDetails,setUserDetails] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
+
+  useEffect(()=>{
+    const fetchUserDetails = async () =>{
+       try{
+        const response = await api.get(`/admin`)
+        console.log(response)
+        setUserDetails(response.data.data)
+       }catch(err){
+        console.log(err)
+        toast.error(err?.response?.data?.message || "Something went wrong.")
+       }
+    }
+
+    fetchUserDetails()
+  },[])
 
   const isActive = (pathname) =>{
     return location.pathname.includes(pathname)
@@ -92,7 +111,7 @@ export default function AdminDashboard() {
             <div className="flex h-20 border-bordercolor border-b items-center justify-center">
               <div className="flex items-center gap-3">
                 <img className="w-8 h-8" alt="logo" src={LOGO}></img>
-                {isMenuOpen && <h1 className="text-themeblue md:block hidden text-white text-2xl transition-all duration-300 font-semibold">Duet</h1>}
+                {isMenuOpen && <h1 className="text-themeblue md:block hidden text-white text-2xl transition-all duration-300 font-semibold">IT Service</h1>}
               </div>
             </div>
             <div className="flex flex-col gap-2 overflow-scroll">
@@ -106,6 +125,10 @@ export default function AdminDashboard() {
              <div onClick={()=>handleNavigate('/admin/users')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
                 <span className={`${isActive('users') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><PeopleOutlinedIcon style={{fontSize:'1.5rem'}}></PeopleOutlinedIcon></span>
                 {isMenuOpen && <span className={`${isActive("users") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Users</span>}
+             </div>
+             <div onClick={()=>handleNavigate('/admin/employee')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
+                <span className={`${isActive('employee') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><PermIdentityOutlinedIcon style={{fontSize:'1.5rem'}}></PermIdentityOutlinedIcon></span>
+                {isMenuOpen && <span className={`${isActive("employee") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Employee</span>}
              </div>
             </div>
       </div>
@@ -129,6 +152,10 @@ export default function AdminDashboard() {
             <div onClick={()=>handleNavigate('/admin/users')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('users') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><PeopleOutlinedIcon style={{fontSize:'1.2rem'}}></PeopleOutlinedIcon></span>
                <span className={`${isActive("users") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Users</span>
+            </div>
+            <div onClick={()=>handleNavigate('/admin/employee')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('employee') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><PermIdentityOutlinedIcon style={{fontSize:'1.2rem'}}></PermIdentityOutlinedIcon></span>
+               <span className={`${isActive("employee") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Employee</span>
             </div>
           </div>
         </div>
@@ -156,8 +183,8 @@ export default function AdminDashboard() {
               ></img>
 
               <div className="md:flex hidden flex-col">
-                <h4 className="text-base leading-4 font-bold">{getName(user?.firstName)}</h4>
-                <h4 className="text-sm">{user?.isAdmin?"Admin":"Employee"}</h4>
+                <h4 className="text-base leading-4 font-bold">{getName(userDetails?.name)}</h4>
+                <h4 className="text-sm">{getName(user?.userType)}</h4>
               </div>
 
               {isProfileOpen && 

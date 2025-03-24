@@ -131,15 +131,46 @@ export const getOneEmployee = async (req, res, next) =>{
   }
 }
 
-export const getAllEmployee = async (req, res, next) =>{
-  try{
-    const employee = await EMPLOYEE.find()
+export const getAllEmployee = async (req, res, next) => {
+  try {
+    // Fetch all employees
+    const employees = await EMPLOYEE.find();
 
-    return res.status(200).json({message:"All employee retrived.",data:employee,status:200})
-  }catch(err){
-    next(err)
+    // Get issue statistics grouped by assigned employee
+    const issueState = await ISSUE.aggregate([
+      {
+        $match: { assignedEmployee: { $ne: null }, status: "Resolved"  } // Ignore null values
+      },
+      {
+        $group: {
+          _id: "$assignedEmployee",
+          completedIssues: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Convert issueStats array to an object for quick lookup
+    const issueMap = issueState.reduce((acc, stat) => {
+      acc[stat._id.toString()] = stat.completedIssues; // Store only count
+      return acc;
+    }, {});
+
+    // Attach completedIssues count to each employee
+    const employeeWithCompletedIssue = employees.map(employee => ({
+      ...employee.toObject(),
+      completedIssues: issueMap[employee._id.toString()] || 0 // Default to 0
+    }));
+
+    return res.status(200).json({
+      message: "All employees retrieved.",
+      data: employeeWithCompletedIssue,
+      status: 200
+    });
+  } catch (err) {
+    next(err);
   }
-}
+};
+
 
 export const assignEmployeeToIssue = async (req, res, next)=>{
   try{
@@ -271,13 +302,55 @@ export const getIssuesByEmployeeId = async (req, res, next) =>{
   try{
     const {empId} = req.params
 
-    if(!empId) return res.status(400).json({message:"Employeeid is required."})
+    if(!empId) return res.status(400).json({message:"Employeeid is required.",status:400})
 
     const employee = await EMPLOYEE.findById(empId).populate('assignedIssues')
 
     if(!employee) return res.status(200).json({message:"Employee is not found.",status:200})
 
     return res.status(200).json({message:"All issues retrived.",status:200,data:employee.assignedIssues})
+
+  }catch(err){
+    next(err)
+  }
+}
+
+//For update employee details from admin side
+export const updateEmployeeFromAdmin = async (req, res, next) =>{
+  try{
+    const {empId} = req.params
+
+    if(!empId) return res.status(400).json({message:"Please provide employee id.",status:400})
+
+    const employee = await EMPLOYEE.findById(empId)
+
+    if(!employee) return res.status(404).json({message:"Employee is not found.",status:404})
+
+    const {email, mobileno} = req.body
+
+    let existEmail = null
+    let existMobileno = null
+
+    if(email && employee.email!==email){
+       existEmail = await LOGINMAPPING.findOne({email})
+
+       if(existEmail) return res.status(409).json({message:"Employee is already exist with same email address.",status:409})
+    }
+
+    if(mobileno && employee.mobileno!==mobileno){
+       existMobileno = await LOGINMAPPING.findOne({mobileno})
+
+       if(existMobileno) return res.status(409).json({message:"Employee is already exist with same mobileno.",status:409})
+    }
+
+    if(!existEmail && !existMobileno){
+       await LOGINMAPPING.findOneAndUpdate({mongoid:empId},{$set:{email,mobileno}})
+    }
+
+    const updatedEmployee = await EMPLOYEE.findByIdAndUpdate(empId,{$set:{...req.body}},{new:true})
+    
+    return res.status(200).json({message:"Employee is updated successfully.",data:updatedEmployee,status:200})
+
 
   }catch(err){
     next(err)

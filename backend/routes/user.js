@@ -8,14 +8,17 @@ const app = express.Router()
 //For creating new user
 app.post('/',createUser)
 
-//For Update user
-app.put('/',verifyToken, updateUser)
+//For Update user in web portal
+app.put('/:userId',verifyToken, updateUser)
 
 //For Get all user
 app.get('/',verifyToken, getAllUser)
 
 //For Get only one user
 app.get('/getone',verifyToken, getUser) 
+
+
+
 
 
 export default app
