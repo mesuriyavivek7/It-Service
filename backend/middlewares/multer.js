@@ -1,13 +1,23 @@
 import multer from 'multer'
 import path from "path"
 import fs from 'fs'
+import { v4 as uuidv4 } from 'uuid'; // Import UUID to generate unique folder names
 
 
 // Function to set dynamic storage path
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log('fieldname',file.fieldname)
-        let folderName = `uploads/${file.fieldname}`
+        let folderName = null
+        
+        if(file.fieldname==="user"){
+           folderName = `uploads/user`
+        }else if(file.fieldname==="issue"){
+           // Generate a unique folder name
+           const uniqueFolder = `uploads/issue/${uuidv4()}`;
+           folderName = uniqueFolder;
+        }else{
+            folderName = 'uploads'
+        }
 
         // Create folder if it doesn't exist
         if (!fs.existsSync(folderName)) {

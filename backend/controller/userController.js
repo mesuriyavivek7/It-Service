@@ -1,6 +1,17 @@
 import USER from "../model/USER.js";
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
 import ISSUE from "../model/ISSUE.js";
+import fs from 'fs'
+
+const removeFile = (filePath) => {
+    try {
+        if (filePath && fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    } catch (error) {
+        console.error(`Error while removing file: ${filePath}`, error);
+    }
+};
 
 //For create new user
 export const createUser = async (req, res, next)=>{
@@ -146,3 +157,62 @@ export const deleteUser = async (req, res, next) =>{
     }
 }
 
+
+export const updateUserFromApplication = async (req, res, next) => {
+    try {
+        const { mongoid } = req;
+
+        if (!mongoid) {
+            removeFile(req.file?.path); // Remove uploaded file if exists
+            return res.status(400).json({ message: "Unauthorized request: Missing user ID", status: 400 });
+        }
+
+        let updatedData = { ...req.body };
+        const user = await USER.findById(mongoid);
+        if (!user) {
+            removeFile(req.file?.path); // Remove uploaded file if exists
+            return res.status(404).json({ message: "User not found.", status: 404 });
+        }
+
+        // Handling mobile number update
+        if (updatedData.mobileno && user.mobileno !== updatedData.mobileno) {
+            const existMobileUser = await LOGINMAPPING.findOne({ mobileno: updatedData.mobileno });
+            if (existMobileUser) {
+                removeFile(req.file?.path); // Remove uploaded file if exists
+                return res.status(409).json({ message: "User already exists with the same mobile number.", status: 409 });
+            }
+
+            await LOGINMAPPING.findByIdAndUpdate(mongoid, { $set: { mobileno: updatedData.mobileno } });
+        }
+
+        // Handling profile picture update
+        if (req.file) {
+            try {
+                // Delete the old profile picture if it exists
+                if (user?.profilePic?.filePath && fs.existsSync(user.profilePic.filePath)) {
+                    fs.unlinkSync(user.profilePic.filePath);
+                }
+
+                updatedData.profilePic = {
+                    fileName: req.file.filename, // Corrected property name
+                    fileSize: req.file.size,
+                    filePath: req.file.path,
+                    fileType: req.file.mimetype
+                };
+            } catch (error) {
+                removeFile(req.file?.path); // Remove new file if error occurs
+                return res.status(500).json({ message: "Error while deleting old file.", status: 500 });
+            }
+        }
+
+ 
+
+        // Update user details
+        const updatedUser = await USER.findByIdAndUpdate(mongoid, { $set: updatedData }, { new: true });
+
+        return res.status(200).json({ message: "User details updated successfully.", data: updatedUser, status: 200 });
+    } catch (err) {
+        removeFile(req.file?.path); // Remove uploaded file if an error occurs
+        next(err);
+    }
+};

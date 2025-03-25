@@ -19,6 +19,7 @@ import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 
 import api from "../api";
 import { toast } from "react-toastify";
@@ -130,6 +131,10 @@ export default function AdminDashboard() {
                 <span className={`${isActive('employee') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><PermIdentityOutlinedIcon style={{fontSize:'1.5rem'}}></PermIdentityOutlinedIcon></span>
                 {isMenuOpen && <span className={`${isActive("employee") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Employee</span>}
              </div>
+             <div onClick={()=>handleNavigate('/admin/booking')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
+                <span className={`${isActive('booking') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><CheckBoxOutlinedIcon style={{fontSize:'1.5rem'}}></CheckBoxOutlinedIcon></span>
+                {isMenuOpen && <span className={`${isActive("booking") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Bookings</span>}
+             </div>
             </div>
       </div>
 
@@ -156,6 +161,10 @@ export default function AdminDashboard() {
             <div onClick={()=>handleNavigate('/admin/employee')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('employee') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><PermIdentityOutlinedIcon style={{fontSize:'1.2rem'}}></PermIdentityOutlinedIcon></span>
                <span className={`${isActive("employee") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Employee</span>
+            </div>
+            <div onClick={()=>handleNavigate('/admin/booking')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('booking') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><CheckBoxOutlinedIcon style={{fontSize:'1.2rem'}}></CheckBoxOutlinedIcon></span>
+               <span className={`${isActive("booking") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Bookings</span>
             </div>
           </div>
         </div>
