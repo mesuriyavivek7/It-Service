@@ -1,7 +1,7 @@
 import multer from 'multer'
 import path from "path"
 import fs from 'fs'
-import { v4 as uuidv4 } from 'uuid'; // Import UUID to generate unique folder names
+
 
 
 // Function to set dynamic storage path
@@ -11,10 +11,8 @@ const storage = multer.diskStorage({
         
         if(file.fieldname==="user"){
            folderName = `uploads/user`
-        }else if(file.fieldname==="issue"){
-           // Generate a unique folder name
-           const uniqueFolder = `uploads/issue/${uuidv4()}`;
-           folderName = uniqueFolder;
+        }else if (file.fieldname === "issue") {
+            folderName = req.uniqueFolder; // Use the same folder for all images in this request
         }else{
             folderName = 'uploads'
         }
@@ -28,7 +26,8 @@ const storage = multer.diskStorage({
     },
 
     filename: function (req, file, cb) {
-        cb(null, file.fieldname + "-" + Date.now() + path.extname(file.originalname));
+        const randomStr = Math.random().toString(36).substring(2, 8); 
+        cb(null, file.fieldname + "-" + Date.now()+ randomStr + path.extname(file.originalname));
     }
 })
 

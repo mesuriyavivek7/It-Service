@@ -9,6 +9,18 @@ import moment from 'moment'
 import dotenv from 'dotenv'
 import USER from "../model/USER.js";
 import twilio from 'twilio'
+import fs from 'fs'
+
+const removeFolder = (folderPath) =>{
+    try{
+      if(fs.existSync(folderPath)){
+         fs.rmSync(folderPath,{ recursive:true, force:true })
+      }
+    }catch(err){
+        console.error(`Error while removing file: ${filePath}`, err);
+    }
+}
+
 
 //Configure dotenv
 dotenv.config()
@@ -47,29 +59,62 @@ export const createIssue = async (req, res, next) =>{
     try{
         const {mongoid, userType} = req
 
-        if(!mongoid || !userType) return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
+        if(!mongoid || !userType){
+            removeFolder(req.uniqueFolder)
+            return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
+        } 
 
-        if(userType!=='user') return res.status(400).json({message:"Invalid user type.",status:400})
+        if(userType!=='user'){
+            removeFolder(req.uniqueFolder)
+            return res.status(400).json({message:"Invalid user type.",status:400})
+        } 
 
         const {issue_description, device, address, time, date, service} = req.body
 
-        if(!issue_description || !device || !time || !date || !service) return res.status(400).json({message:"Please provide all required fields.",status:400})
+        if(!issue_description || !device || !time || !date || !service){
+            removeFolder(req.uniqueFolder)
+            return res.status(400).json({message:"Please provide all required fields.",status:400})
+        }
+         
 
         //Check device exist or not
         const checkDevice = await DEVICE.findById(device)
 
-        if(!checkDevice) return res.status(404).json({message:"Device is not found.",status:404})
+        if(!checkDevice){
+            removeFolder(req.uniqueFolder)
+            return res.status(404).json({message:"Device is not found.",status:404})
+        } 
 
         //Check Service exist or not
         const checkService = await SERVICE.findById(service)
 
-        if(!checkService) return res.status(404).json({message:"Service is not found.",status:404})
+        if(!checkService){
+            removeFolder(req.uniqueFolder)
+            return res.status(404).json({message:"Service is not found.",status:404})
+        }
 
         //Check time exist or not
         const checkTime = await TIME.findById(time)
 
-        if(!checkTime) return res.status(404).json({message:"Time is not found",status:404})
+        if(!checkTime){
+            removeFolder(req.uniqueFolder)
+            return res.status(404).json({message:"Time is not found",status:404})
+        }
 
+        let images = []
+
+        if(req.files.length !== 0){
+             images = req.files.map((file)=>
+              (
+                {
+                    fileName:file.fileName,
+                    filePath:file.path,
+                    fileType:file.mimetype,
+                    fileSize:file.size
+                }
+              )
+             )
+        }
         
         const newIssue = new ISSUE({
             issue_description,
@@ -78,7 +123,8 @@ export const createIssue = async (req, res, next) =>{
             time,
             date,
             added_by:mongoid,
-            service
+            service,
+            images
         })
         
         await newIssue.save()
