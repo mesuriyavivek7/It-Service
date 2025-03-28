@@ -149,7 +149,7 @@ export const bookingColumns = (handleOpenBookingPreview) => [
             <div className="w-full h-full flex justify-start">
                <div className="flex gap-2 items-center justify-center">
                 <img src={LAPTOP} className="w-6 h-6"></img>
-                <span>{params.value.brand} <small>({params.value.device_type})</small></span>
+                <span>{params?.value?.brand && params.value.brand} <small>({params?.value?.device_type && params.value.device_type})</small></span>
                </div>
             </div>
         )
