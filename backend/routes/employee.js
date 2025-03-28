@@ -24,7 +24,7 @@ app.post('/assigntoissue',verifyToken,verifyAdmin,assignEmployeeToIssue)
 app.post('/removeEmployeeFromIssue',verifyToken,verifyAdmin,removeEmployeeFromIssue)
 
 //For check availability of employees 
-app.post('/getAvailableEmployees/:issueId',verifyToken,verifyAdmin,checkAvailibiltyOfEmployee)
+app.get('/getAvailableEmployees/:issueId',verifyToken,verifyAdmin,checkAvailibiltyOfEmployee)
 
 //For get issues of eny employee
 app.get('/getissues/:empId',verifyToken,getIssuesByEmployeeId)
