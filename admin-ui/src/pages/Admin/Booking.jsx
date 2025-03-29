@@ -10,6 +10,7 @@ import { bookingColumns, fetchBookingData } from '../../data/bookingData';
 
 import { Search } from "lucide-react";
 import { RefreshCcw } from "lucide-react";
+import api from '../../api';
 
 
 function Booking() {
@@ -59,16 +60,33 @@ function Booking() {
     setIsOpenPreview(true)
   }
 
-  const handleCloseBookingPreview = (data) =>{
+  const handleCloseBookingPreview = () =>{
+    fetchData()
     setSelectedBooking(null)
     setIsOpenPreview(false)
   } 
+
+
+  const handleRemoveEmployee = async (issueData) =>{
+     try{
+       let Obj = {
+        issueId:issueData.id,
+        employeeId:issueData.assignedEmployee._id
+       }
+       const response = await api.post('employee/removeEmployeeFromIssue',Obj)
+       await fetchData()
+       toast.success("Successfully employee removed from booking.")
+     }catch(err){
+      console.log(err)
+      toast.error(err?.response?.data?.message || "Something went wrong.")
+     }
+  }
 
   return (
     <div className='flex h-full flex-col gap-4'>
       {
         isOpenPreview && 
-        <AssignEmployee></AssignEmployee>
+        <AssignEmployee issueData={selectedBooking} handleCloseBookingPreview={handleCloseBookingPreview}></AssignEmployee>
       }
       <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
         <div></div>
@@ -98,7 +116,7 @@ function Booking() {
           }}>
            <DataGrid
             rows={filterBooking}
-            columns={bookingColumns(handleOpenBookingPreview)}
+            columns={bookingColumns(handleOpenBookingPreview,handleRemoveEmployee)}
             loading={loading}
             rowHeight={70}
             initialState={{

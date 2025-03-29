@@ -254,9 +254,34 @@ export const checkAvailibiltyOfEmployee = async (req, res, next) => {
     // Fetch all employees
     const employees = await EMPLOYEE.find({ availability: true });
 
+    // Get issue statistics grouped by assigned employee
+    const issueState = await ISSUE.aggregate([
+      {
+        $match: { assignedEmployee: { $ne: null }, status: "Resolved"  } // Ignore null values
+      },
+      {
+        $group: {
+          _id: "$assignedEmployee",
+          completedIssues: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // Convert issueStats array to an object for quick lookup
+    const issueMap = issueState.reduce((acc, stat) => {
+      acc[stat._id.toString()] = stat.completedIssues; // Store only count
+      return acc;
+    }, {});
+
+    // Attach completedIssues count to each employee
+    const employeeWithCompletedIssue = employees.map(employee => ({
+      ...employee.toObject(),
+      completedIssues: issueMap[employee._id.toString()] || 0 // Default to 0
+    }));
+
     // Filter available employees
     const availableEmployees = await Promise.all(
-      employees.map(async (emp) => {
+      employeeWithCompletedIssue.map(async (emp) => {
         const leaveExists = await LEAVE.findOne({
           added_by: emp._id,
           status: "Approved",

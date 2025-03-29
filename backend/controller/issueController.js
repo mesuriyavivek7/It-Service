@@ -171,21 +171,23 @@ export const getAllIssues = async (req, res, next) =>{
        const {status} = req.query
        
        if(!status){
-        const allIssues = await ISSUE.find()
+        const allIssues = await ISSUE.find().sort({ createdAt: -1 })
         .populate('address')
         .populate('device')
         .populate('time')
         .populate('service')
         .populate('added_by')
+        .populate('assignedEmployee')
 
         return res.status(200).json({message:"All issues retrived.",data:allIssues,status:200})
        }else{
-         const filterIssues = await ISSUE.find({status:status})
+         const filterIssues = await ISSUE.find({status:status}).sort({createdAt: -1})
         .populate('address')
         .populate('device')
         .populate('time')
         .populate('service')
         .populate('added_by')
+        .populate('assignedEmployee')
 
          return res.status(200).json({message:`${status} issues retrived.`,data:filterIssues})
        }
