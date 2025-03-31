@@ -1,6 +1,6 @@
 import express from 'express'
-import { cancelIssue, createIssue, getAllIssues, getOneIssue, resolveIssue, verifyResolveIssue } from '../controller/issueController.js'
-import { verifyToken } from '../middlewares/authMiddleware.js'
+import { cancelIssue, createIssue, getAllIssues, getOneIssue, getOneIssueForAdmin, resolveIssue, verifyResolveIssue } from '../controller/issueController.js'
+import { verifyAdmin, verifyToken } from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/multer.js'
 import fs from 'fs'
 import { v4 as uuidv4 } from 'uuid'; // Import UUID to generate unique folder names
@@ -22,6 +22,9 @@ app.get('/',verifyToken,getAllIssues)
 
 //For get one issue
 app.get('/getone/:issueId',verifyToken,getOneIssue)
+
+//For get one issue for admin
+app.get('/getoneForAdmin/:issueId',verifyToken,getOneIssueForAdmin)
 
 //For Cancel issue
 app.post('/cancelissue/:issueId',verifyToken,cancelIssue)

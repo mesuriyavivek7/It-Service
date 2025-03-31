@@ -155,10 +155,35 @@ export const getOneIssue = async (req, res, next) =>{
         .populate('time')
         .populate('service')
         .populate('added_by')
+        .populate('assignedEmployee')
 
         if(!issue) return res.status(404).json({message:"issue not found.",status:404})
 
         return res.status(200).json({message:'issue retrived.',data:issue,status:200})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+//Get One Issue for admin
+export const getOneIssueForAdmin = async (req, res, next) =>{
+    try{
+        const {issueId} = req.params
+
+        if(!issueId) return res.status(400).json({message:"Please provide issue id.",status:400})
+
+        const issue = await ISSUE.findById(issueId)
+        .populate('address')
+        .populate('device')
+        .populate('time')
+        .populate('service')
+        .populate('added_by')
+        .populate('assignedEmployee')
+
+        if(!issue) return res.status(404).json({message:"Issue is not found.",status:404})
+
+        return res.status(200).json({message:"Issue retrived successfully.",data:issue,status:200})
 
     }catch(err){
         next(err)

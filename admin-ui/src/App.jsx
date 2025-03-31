@@ -14,6 +14,7 @@ import User from './pages/Admin/User';
 import Employee from './pages/Admin/Employee';
 import Booking from './pages/Admin/Booking';
 import PreviewBooking from './pages/Admin/PreviewBooking';
+import Service from './pages/Admin/Service';
 
 
 const ProtectedRoute = ({children, requiredRole}) => {
@@ -66,9 +67,9 @@ function App() {
            <Route path='dashboard' element={<MainAdmin></MainAdmin>}></Route>
            <Route path='users' element={<User></User>}></Route>
            <Route path='employee' element={<Employee></Employee>}></Route>
-           <Route path='booking' element={<Booking></Booking>}>
-            <Route path='preview' element={<PreviewBooking></PreviewBooking>}></Route>
-           </Route>
+           <Route path='booking' element={<Booking></Booking>}></Route>
+           <Route path='booking/preview' element={<PreviewBooking></PreviewBooking>}></Route>
+           <Route path='service' element={<Service></Service>}></Route>
          </Route>
 
       </Routes>

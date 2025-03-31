@@ -3,6 +3,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import AssignEmployee from '../../components/AssignEmployee';
 import { toast } from "react-toastify";
+import { Navigate, useNavigate } from 'react-router-dom';
 
 //Importing data
 import { bookingColumns, fetchBookingData } from '../../data/bookingData';
@@ -15,16 +16,19 @@ import api from '../../api';
 
 function Booking() {
   const [booking,setBooking] = useState([]);
+  const [bookingType,setBookingType] = useState('')
   const [filterBooking,setFilterBooking] = useState([])
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpenPreview, setIsOpenPreview] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  
+  const navigate = useNavigate()
 
   const fetchData = async () =>{
     setLoading(true)
     try{
-        const data = await fetchBookingData()
+        const data = await fetchBookingData(bookingType)
         setBooking(()=> data.map((item)=> ({id:item._id, ...item})))
     }catch(err){
         console.log(err)
@@ -52,7 +56,7 @@ function Booking() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [bookingType]);
 
 
   const handleOpenBookingPreview = (data) =>{
@@ -82,6 +86,10 @@ function Booking() {
      }
   }
 
+  const navigateToPreview = (data) =>{
+     navigate('preview',{state:data})
+  }
+
   return (
     <div className='flex h-full flex-col gap-4'>
       {
@@ -89,7 +97,14 @@ function Booking() {
         <AssignEmployee issueData={selectedBooking} handleCloseBookingPreview={handleCloseBookingPreview}></AssignEmployee>
       }
       <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
-        <div></div>
+        <div>
+          <select onChange={(e)=>setBookingType(e.target.value)} value={bookingType} className='border py-1.5 px-2 outline-none rounded-md border-grayborder'>
+            <option value={''}>All Bookings</option>
+            <option value={'Pending'}>Pending Bookings</option>
+            <option value={'Resolved'}>Resolved Bookings</option>
+            <option value={'Canceled'}>Canceled Bookings</option>
+          </select>
+        </div>
 
         <div className='flex items-center gap-2'>
             <div className='flex border border-grayborder gap-2 rounded-md py-1.5 px-2 items-center'>
@@ -119,6 +134,7 @@ function Booking() {
             columns={bookingColumns(handleOpenBookingPreview,handleRemoveEmployee)}
             loading={loading}
             rowHeight={70}
+            onRowClick={(params)=>navigateToPreview(params.row)}
             initialState={{
             pagination: {
               paginationModel: {

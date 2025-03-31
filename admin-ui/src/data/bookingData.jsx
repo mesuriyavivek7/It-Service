@@ -1,5 +1,4 @@
 import api from "../api";
-import Tooltip from "@mui/material/Tooltip";
 
 //Importing images
 import REMOTE from '../assets/remote.png'
@@ -85,10 +84,20 @@ export const bookingColumns = (handleOpenBookingPreview,handleRemoveEmployee) =>
                        <img src={EMP} className="w-7 h-7 rounded-full"></img>
                        <span className="leading-5">{params.value.name}</span>
                     </div>
-                    {params.row.status==="Pending" && <button onClick={()=>handleRemoveEmployee(params.row)} className="text-center w-32 flex justify-center items-center text-white hover:bg-red-600 transition-all duration-300 cursor-pointer h-6 rounded-md font-medium bg-red-500">Remove</button>}
+                    {params.row.status==="Pending" && 
+                    <button onClick={(e)=>{
+                        e.stopPropagation();  // Prevent row click event
+                        handleRemoveEmployee(params.row)
+                    }} className="text-center w-32 flex justify-center items-center text-white hover:bg-red-600 transition-all duration-300 cursor-pointer h-6 rounded-md font-medium bg-red-500">
+                    Remove</button>}
                 </div>:
                 <div className="flex justify-start items-center w-full h-full">
-                    <button onClick={()=>handleOpenBookingPreview(params.row)} className="bg-button flex justify-center items-center p-1.5 cursor-pointer rounded-md h-8 text-white font-medium">Assign Employee</button>
+                    <button onClick={(e)=>{
+                        e.stopPropagation();  // Prevent row click event
+                        handleOpenBookingPreview(params.row)
+                    }} className="bg-button flex justify-center items-center p-1.5 cursor-pointer rounded-md h-8 text-white font-medium">
+                        Assign Employee
+                    </button>
                 </div>
         )
     },
@@ -192,9 +201,10 @@ export const bookingColumns = (handleOpenBookingPreview,handleRemoveEmployee) =>
 ]
 
 
-export const fetchBookingData = async () =>{
+export const fetchBookingData = async (bookingType) =>{
     try{
-       const response = await api.get('/issue')
+       console.log(bookingType)
+       const response = await api.get(`/issue?status=${bookingType}`)
        console.log(response)
        return response.data.data
     }catch(err){
