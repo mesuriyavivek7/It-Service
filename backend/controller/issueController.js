@@ -214,7 +214,7 @@ export const getAllIssues = async (req, res, next) =>{
         .populate('added_by')
         .populate('assignedEmployee')
 
-         return res.status(200).json({message:`${status} issues retrived.`,data:filterIssues})
+         return res.status(200).json({message:`${status} issues retrived.`,data:filterIssues,status:200})
        }
       
     }catch(err){

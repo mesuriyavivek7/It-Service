@@ -66,7 +66,7 @@ export const bookingColumns = (handleOpenBookingPreview,handleRemoveEmployee) =>
             <div className="w-full h-full flex justify-start">
                <div className="flex justify-center items-center gap-2">
                   <img src={params?.value?.profilePic?.filePath?`${import.meta.env.VITE_APP_API_IMAGE_URL}/${params.value.profilePic.filePath}`:USER} className="w-7 h-7 rounded-full "></img>
-                  <span>{params.value.name}</span>
+                  <span>{params.value?.name}</span>
                </div>
             </div>
         )

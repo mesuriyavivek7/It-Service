@@ -26,7 +26,7 @@ function Service() {
 
   return (
     <div className='w-full flex flex-col gap-4 h-full'>
-       <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
+       <div className='bg-white items-center flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
 
           <h1 className='text-black text-lg font-medium'>Booking Services</h1>
 

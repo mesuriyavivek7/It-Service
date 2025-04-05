@@ -381,3 +381,43 @@ export const updateEmployeeFromAdmin = async (req, res, next) =>{
     next(err)
   }
 }
+
+
+export const getAllIssuesForEmployee = async (req, res, next) =>{
+  try{
+    const {mongoid, userType} = req
+
+    if(!mongoid || !userType){
+        return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
+    } 
+
+    if(userType!=='employee') return res.status(401).json({message:"userType is invalid.",status:401})
+
+    const {status} = req.query
+
+    if(!status) {
+      const allIssues = await ISSUE.find({assignedEmployee:mongoid}).sort({createdAt:-1})
+      .populate('address')
+      .populate('device')
+      .populate('time')
+      .populate('service')
+      .populate('added_by')
+      .populate('assignedEmployee')
+
+      return res.status(200).json({message:"All issues retrived.",data:allIssues,status:200})
+    }else {
+      const filterIssues = await ISSUE.find({status:status,assignedEmployee:mongoid}).sort({createdAt:-1})
+      .populate('address')
+      .populate('device')
+      .populate('time')
+      .populate('service')
+      .populate('added_by')
+      .populate('assignedEmployee')
+
+      return res.status(200).json({message:`${status} Issue retrived.`,data:filterIssues,status:200})
+    }
+    
+  }catch(err){
+    next(err)
+  }
+}
