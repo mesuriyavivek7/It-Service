@@ -21,6 +21,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import { Clock } from 'lucide-react';
+
 
 import api from "../api";
 import { toast } from "react-toastify";
@@ -140,6 +142,10 @@ export default function AdminDashboard() {
                 <span className={`${isActive('service') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><Inventory2OutlinedIcon style={{fontSize:'1.5rem'}}></Inventory2OutlinedIcon></span>
                 {isMenuOpen && <span className={`${isActive("service") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Services</span>}
              </div>
+             <div onClick={()=>handleNavigate('/admin/time')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
+                <span className={`${isActive('time') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><Clock style={{fontSize:'1.5rem'}}></Clock></span>
+                {isMenuOpen && <span className={`${isActive("time") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Times</span>}
+             </div>
             </div>
       </div>
 
@@ -174,6 +180,10 @@ export default function AdminDashboard() {
             <div onClick={()=>handleNavigate('/admin/service')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('service') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><Inventory2OutlinedIcon style={{fontSize:'1.2rem'}}></Inventory2OutlinedIcon></span>
                <span className={`${isActive("service") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Services</span>
+            </div>
+            <div onClick={()=>handleNavigate('/admin/time')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('time') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><Clock style={{fontSize:'1.2rem'}}></Clock></span>
+               <span className={`${isActive("time") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Times</span>
             </div>
           </div>
         </div>
