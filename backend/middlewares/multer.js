@@ -12,9 +12,9 @@ const storage = multer.diskStorage({
         if(file.fieldname==="user"){
            folderName = `uploads/user`
         }else if (file.fieldname === "issue") {
-            folderName = req.uniqueFolder; // Use the same folder for all images in this request
-        }else{
-            folderName = 'uploads'
+            folderName = req.uniqueFolder; // Use the same folder for all images in this reques
+        }else if(file.fieldname === "service"){
+            folderName = 'uploads/service'
         }
 
         // Create folder if it doesn't exist

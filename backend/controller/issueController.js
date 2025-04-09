@@ -17,7 +17,7 @@ const removeFolder = (folderPath) =>{
          fs.rmSync(folderPath,{ recursive:true, force:true })
       }
     }catch(err){
-        console.error(`Error while removing file: ${filePath}`, err);
+        console.error(`Error while removing file: ${folderPath}`, err);
     }
 }
 
@@ -237,6 +237,8 @@ export const cancelIssue = async (req, res, next) =>{
 
         if(!issue) return res.status(404).json({message:"Issue is not found.",status:404})
 
+        if(issue.status==="Ongoing") return res.status(400).json({message:"Issue cant't be cancelled because employee is ongoing for service.",status:400})
+
         if(!checkCancellation(issue.date,issue.time?.time)) return res.status(404).json({message:"Cancellation not allowed within 1 hour of scheduled time."})
         
         if(issue.assignedEmployee){
@@ -249,6 +251,36 @@ export const cancelIssue = async (req, res, next) =>{
         await ISSUE.findByIdAndUpdate(issueId,{$set:{status:'Canceled'}})
         
         return res.status(200).json({message:"Your requested service canceled.",status:200})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+//For start issue working by employee
+export const startIssueWorking = async (req, res, next) =>{
+    try{
+        const {mongoid, userType} = req
+
+        if(!mongoid || !userType) return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
+
+        if(userType!=="employee") return res.status(401).json({message:"You are now allowed to start working on this issue.",status:401})
+
+        const {issueId} = req.params
+
+        if(!issueId) return res.status(400).json({message:"Please provide issue id for resolve this issue.",status:400})
+
+        const issue = await ISSUE.findById(issueId)
+
+        if(!issue) return res.status(404).json({message:"Issue is not found.",status:404})
+
+        if(!issue.assignedEmployee) return res.status(400).json({message:"No Any employee assigned to this issue.",status:400})
+
+        if(issue.assignedEmployee.toString() !==  mongoid.toString()) return res.status(400).json({message:"Requested issue is not assigned to you."})
+
+        const updatedIssue = await ISSUE.findByIdAndUpdate(issueId,{$set:{status:"Ongoing"}},{new:true})
+
+        return res.status(200).json({message:"Issue status sucessfully changed from pending to ongoing.",data:updatedIssue,status:200})
 
     }catch(err){
         next(err)
@@ -344,7 +376,9 @@ export const verifyResolveIssue = async (req, res, next) =>{
 
        await EMPLOYEE.findByIdAndUpdate(issue.assignedEmployee,{$pull:{assignedIssues:issueId}})
 
-    //    await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
+       await ISSUE.findByIdAndUpdate(issueId,{$set:{status:'Resolved'}})
+
+    //  await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
 
        return res.status(200).json({message:"Service resolved successfully.",status:200})
 

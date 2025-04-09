@@ -50,7 +50,7 @@ const issueSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['Pending','Resolved','Canceled'],
+        enum:['Pending','Resolved','Canceled','Ongoing'],
         default:"Pending",
     },
     service:{

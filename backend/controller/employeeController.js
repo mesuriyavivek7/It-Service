@@ -217,6 +217,8 @@ export const removeEmployeeFromIssue = async (req, res, next) =>{
 
       if(!issue) return res.status(404).json({message:"Issue is not found.",status:404})
 
+      if(issue.status==="Ongoing") return res.status(400).json({message:"Employee is ongoing for providing service.",status:400})
+
       await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null}})
 
       await EMPLOYEE.findByIdAndUpdate(employeeId,{$pull:{assignedIssues:issueId}})
