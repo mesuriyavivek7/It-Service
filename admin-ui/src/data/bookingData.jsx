@@ -204,7 +204,7 @@ export const bookingColumns = (handleOpenBookingPreview,handleRemoveEmployee) =>
 export const fetchBookingData = async (bookingType) =>{
     try{
        console.log(bookingType)
-       const response = await api.get(`/issue?status=${bookingType}`)
+       const response = await api.get(`/issue/getall-admin?status=${bookingType}`)
        console.log(response)
        return response.data.data
     }catch(err){

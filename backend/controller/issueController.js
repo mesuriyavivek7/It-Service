@@ -193,10 +193,18 @@ export const getOneIssueForAdmin = async (req, res, next) =>{
 //Get all issues 
 export const getAllIssues = async (req, res, next) =>{
     try{
+
+        const {mongoid, userType} = req
+
+        if(!mongoid || !userType){
+            removeFolder(req.uniqueFolder)
+            return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
+        } 
+
        const {status} = req.query
        
        if(!status){
-        const allIssues = await ISSUE.find().sort({ createdAt: -1 })
+        const allIssues = await ISSUE.find({added_by:mongoid}).sort({ createdAt: -1 })
         .populate('address')
         .populate('device')
         .populate('time')
@@ -381,6 +389,38 @@ export const verifyResolveIssue = async (req, res, next) =>{
     //  await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
 
        return res.status(200).json({message:"Service resolved successfully.",status:200})
+
+    }catch(err){
+        next(err)
+    }
+}
+
+export const getAllIssueForAdmin = async (req, res, next) =>{
+    try{
+       
+        const {status} = req.query
+       
+        if(!status){
+         const allIssues = await ISSUE.find().sort({ createdAt: -1 })
+         .populate('address')
+         .populate('device')
+         .populate('time')
+         .populate('service')
+         .populate('added_by')
+         .populate('assignedEmployee')
+ 
+         return res.status(200).json({message:"All issues retrived.",data:allIssues,status:200})
+        }else{
+          const filterIssues = await ISSUE.find({status:status}).sort({createdAt: -1})
+         .populate('address')
+         .populate('device')
+         .populate('time')
+         .populate('service')
+         .populate('added_by')
+         .populate('assignedEmployee')
+ 
+          return res.status(200).json({message:`${status} issues retrived.`,data:filterIssues,status:200})
+        }
 
     }catch(err){
         next(err)

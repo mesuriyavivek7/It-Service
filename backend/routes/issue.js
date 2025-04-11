@@ -1,5 +1,5 @@
 import express from 'express'
-import { cancelIssue, createIssue, getAllIssues, getOneIssue, getOneIssueForAdmin, resolveIssue, startIssueWorking, verifyResolveIssue } from '../controller/issueController.js'
+import { cancelIssue, createIssue, getAllIssueForAdmin, getAllIssues, getOneIssue, getOneIssueForAdmin, resolveIssue, startIssueWorking, verifyResolveIssue } from '../controller/issueController.js'
 import { verifyAdmin, verifyToken } from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/multer.js'
 import fs from 'fs'
@@ -19,6 +19,9 @@ app.post('/',verifyToken,setUniqueFolder,upload.array('issue',3),createIssue)
 
 //For get all issues 
 app.get('/',verifyToken,getAllIssues)
+
+//For get all issues for admin
+app.get('/getall-admin',verifyToken,verifyAdmin,getAllIssueForAdmin)
 
 //For get one issue
 app.get('/getone/:issueId',verifyToken,getOneIssue)
