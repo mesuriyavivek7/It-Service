@@ -1,6 +1,6 @@
 import express from 'express'
 import { verifyToken, verifyAdmin } from '../middlewares/authMiddleware.js'
-import { createTime, getAllTimes, updateTime } from '../controller/timeController.js'
+import { createTime, deleteTime, getAllTimes, updateTime } from '../controller/timeController.js'
 
 const app = express.Router()
 
@@ -14,6 +14,6 @@ app.put('/:timeId',verifyToken,verifyAdmin,updateTime)
 app.get('/',verifyToken,getAllTimes)
 
 //Delete time
-
+app.delete('/:timeId',verifyToken,deleteTime)
 
 export default app
