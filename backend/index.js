@@ -24,6 +24,7 @@ import issueRoute from './routes/issue.js'
 import employeeRoute from './routes/employee.js'
 import timeRoute from './routes/time.js'
 import leaveRoute from './routes/leave.js'
+import twilioRoute from './routes/twilio.js'
 
 // App configuration
 const port = process.env.PORT || 8080;
@@ -100,6 +101,7 @@ app.use('/api/issue',issueRoute)
 app.use('/api/employee',employeeRoute)
 app.use('/api/time',timeRoute)
 app.use('/api/leave',leaveRoute)
+app.use('/api/twilio',twilioRoute)
 
 // Middleware to catch errors
 app.use((err, req, res, next) => {

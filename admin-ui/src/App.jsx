@@ -16,6 +16,7 @@ import Booking from './pages/Admin/Booking';
 import PreviewBooking from './pages/Admin/PreviewBooking';
 import Service from './pages/Admin/Service';
 import Time from './pages/Admin/Time';
+import Setting from './pages/Admin/Setting';
 
 
 const ProtectedRoute = ({children, requiredRole}) => {
@@ -72,6 +73,7 @@ function App() {
            <Route path='booking/preview' element={<PreviewBooking></PreviewBooking>}></Route>
            <Route path='service' element={<Service></Service>}></Route>
            <Route path='time' element={<Time></Time>}></Route>
+           <Route path='setting' element={<Setting></Setting>}></Route>
          </Route>
 
       </Routes>

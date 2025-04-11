@@ -22,6 +22,8 @@ import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { Clock } from 'lucide-react';
+import { Settings } from 'lucide-react';
+
 
 
 import api from "../api";
@@ -146,6 +148,10 @@ export default function AdminDashboard() {
                 <span className={`${isActive('time') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><Clock style={{fontSize:'1.5rem'}}></Clock></span>
                 {isMenuOpen && <span className={`${isActive("time") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Times</span>}
              </div>
+             <div onClick={()=>handleNavigate('/admin/setting')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
+                <span className={`${isActive('setting') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><Settings style={{fontSize:'1.5rem'}}></Settings></span>
+                {isMenuOpen && <span className={`${isActive("setting") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Setting</span>}
+             </div>
             </div>
       </div>
 
@@ -184,6 +190,10 @@ export default function AdminDashboard() {
             <div onClick={()=>handleNavigate('/admin/time')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('time') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><Clock style={{fontSize:'1.2rem'}}></Clock></span>
                <span className={`${isActive("time") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Times</span>
+            </div>
+            <div onClick={()=>handleNavigate('/admin/setting')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('setting') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><Settings style={{fontSize:'1.2rem'}}></Settings></span>
+               <span className={`${isActive("setting") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Setting</span>
             </div>
           </div>
         </div>
