@@ -119,7 +119,7 @@ export const getOneEmployee = async (req, res, next) =>{
   try{
     const {mongoid} = req
 
-    if(!mongoid) return res.status(401).json({ message: "Unauthorized request: Missing user ID or user Type", status: 400 });
+    if(!mongoid) return res.status(401).json({ message: "Unauthorized request: Missing user ID or user Type", status: 401 });
 
     const employee = await EMPLOYEE.findById(mongoid)
 
