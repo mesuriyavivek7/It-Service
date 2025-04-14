@@ -1,12 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 //Importing components
+import Notification from "../pages/Admin/Notification";
 
 //importing images
 import PERSON from '../assets/asset4.jpg'
 import LOGO from '../assets/security.png'
+
+
+//Importing icons
+import { Bell } from 'lucide-react';
 
 
 import { useLocation , Outlet, useNavigate} from "react-router-dom";
@@ -36,6 +42,21 @@ export default function AdminDashboard() {
   const [userDetails,setUserDetails] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
+
+  const [notification,setNotification] = useState([])
+  const [openNotification,setOpenNotification] = useState(false)
+
+  const shakeAnimation = {
+    shake: {
+      rotate: [0, -15, 15, -10, 10, -5, 5, 0],
+      transition: {
+        duration: 1,
+        repeat: Infinity,
+        repeatType: "loop",
+        ease: "easeInOut",
+      },
+    },
+  };
 
   useEffect(()=>{
     const fetchUserDetails = async () =>{
@@ -200,7 +221,7 @@ export default function AdminDashboard() {
 
       {/* Main content */}
       <div className={`${isMenuOpen?"md:left-[16%] left-0":"md:left-[6%] left-0"} transition-all duration-300 top-0 right-0 bottom-0 h-full fixed flex flex-col`}>
-
+      <Notification setNotification={setNotification} notification={notification} setOpenNotification={setOpenNotification} openNotification={openNotification}></Notification>
       {/* Navbar */}
         <div className="flex bg-white z-40 md:h-22 border-b-shadow shadow h-16 justify-between px-4 md:px-8 w-full items-center">
 
@@ -213,6 +234,17 @@ export default function AdminDashboard() {
         
 
           <div className="flex items-center gap-4 md:gap-8">
+
+            <button onClick={()=>setOpenNotification((prev)=> !prev)} className="bg-themecolor cursor-pointer relative p-2 rounded-full">
+              {notification.length !== 0 && <div className="bg-blue-500 absolute w-4.5 h-4.5 flex justify-center items-center rounded-full text-xs text-white -top-2 -right-1">{notification.length}</div>}
+              <motion.div
+               variants={shakeAnimation}
+               animate={notification.length !== 0 ? "shake" : ""}
+               className="">
+              <Bell className="text-white w-5 h-5"></Bell>
+              </motion.div>
+            </button>
+
             <div onClick={()=>setIsProfileOpen(!isProfileOpen)} className="relative flex cursor-pointer items-center gap-3">
               <img
                 className="md:w-12 md:h-12 h-10 w-10 rounded-full"

@@ -3,6 +3,7 @@ import DEVICE from "../model/DEVICE.js";
 import SERVICE from "../model/SERVICE.js";
 import ADDRESS from "../model/ADDRESS.js";
 import EMPLOYEE from "../model/EMPLOYEE.js";
+import ADMIN from "../model/ADMIN.js";
 import TIME from "../model/TIME.js";
 import OTP from "../model/OTP.js";
 import moment from 'moment'
@@ -10,6 +11,11 @@ import dotenv from 'dotenv'
 import USER from "../model/USER.js";
 import twilio from 'twilio'
 import fs from 'fs'
+import NOTIFY from "../model/NOTIFY.js";
+
+import { io } from "../index.js";
+
+
 
 const removeFolder = (folderPath) =>{
     try{
@@ -76,6 +82,13 @@ export const createIssue = async (req, res, next) =>{
             return res.status(400).json({message:"Please provide all required fields.",status:400})
         }
          
+        //Check user exist or not
+        const existUser = await USER.findById(mongoid)
+
+        if(!existUser){
+            removeFolder(req.uniqueFolder)
+            return res.status(404).json({message:"User is not found",status:404})
+        }
 
         //Check device exist or not
         const checkDevice = await DEVICE.findById(device)
@@ -128,6 +141,31 @@ export const createIssue = async (req, res, next) =>{
         })
         
         await newIssue.save()
+
+        const admin = await ADMIN.find()
+
+        if(admin.length!==0){
+
+          const message = `New Issue created by ${existUser.name} on ${new Date().toLocaleString()}`
+
+          const notification = new NOTIFY({
+            from:mongoid,
+            fromType:'user',
+            to:admin[0]._id,
+            toType:'admin',
+            message,
+            type:'issue_created',
+          })
+
+          await notification.save()
+
+          io.to(`admin_${admin[0]._id}`).emit("issue_created", {
+            message,
+            data:newIssue,
+            notification,
+          })
+
+        }
 
         return res.status(200).json({message:"New service created successfully",data:newIssue,status:200})
     }catch(err){
