@@ -9,7 +9,7 @@ app.post('/',verifyToken,verifyAdmin,createConfiguration)
 
 
 //For update configuration
-app.put('/',verifyToken,verifyAdmin,updateConfiguration)
+app.put('/:Id',verifyToken,verifyAdmin,updateConfiguration)
 
 
 //For get configuration

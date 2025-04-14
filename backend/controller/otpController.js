@@ -1,19 +1,13 @@
 import OTP from "../model/OTP.js";
-import dotenv from 'dotenv'
 import twilio from 'twilio'
 import jwt from 'jsonwebtoken'
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
 import USER from "../model/USER.js";
 import EMPLOYEE from "../model/EMPLOYEE.js";
+import TWILIO from "../model/TWILIO.js";
 
 
-//Configure dotenv
-dotenv.config()
 
-const accountSiD=process.env.ACCOUNT_SID
-const authToken=process.env.AUTH_TOKEN
-
-const client = new twilio(accountSiD, authToken);
 
 //For generate otp
 const generateOTP = () => Math.floor(1000 + Math.random() * 9000).toString();
@@ -32,9 +26,17 @@ export const sendOtp = async (req, res, next) =>{
 
         const otp = generateOTP()
 
+        //For get twilio configuration from db
+
+        const twilioConfiguration = await TWILIO.find()
+
+        const tConfigure = twilioConfiguration[0]
+
+        const client = new twilio(tConfigure.accountsid, tConfigure.authtoken);
+
         const message = await client.messages.create({
             body: `Your verification code is: ${otp}`,
-            from: process.env.TWILIO_PHONE_NUMBER,
+            from: tConfigure.mobileno,
             to: mobileno
         });
 
@@ -110,12 +112,17 @@ export const sendOtpForCreateUser = async (req, res, next)=>{
 
         const otp = generateOTP()
 
+        const twilioConfiguration = await TWILIO.find()
+
+        const tConfigure = twilioConfiguration[0]
+
+        const client = new twilio(tConfigure.accountsid, tConfigure.authtoken);
+
         const message = await client.messages.create({
             body: `Your verification code is: ${otp}`,
-            from: process.env.TWILIO_PHONE_NUMBER,
+            from: tConfigure.mobileno,
             to: mobileno
         });
-
 
         let newOtp = new OTP({
             name,
