@@ -426,7 +426,7 @@ export const verifyResolveIssue = async (req, res, next) =>{
 
     //  await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
 
-       return res.status(200).json({message:"Service resolved successfully.",status:200})
+       return res.status(200).json({message:"Service resolved successfully.",data:{otp:dbotp.otp},status:200})
 
     }catch(err){
         next(err)

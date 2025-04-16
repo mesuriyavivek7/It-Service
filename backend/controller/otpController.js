@@ -34,11 +34,11 @@ export const sendOtp = async (req, res, next) =>{
 
         const client = new twilio(tConfigure.accountsid, tConfigure.authtoken);
 
-        const message = await client.messages.create({
-            body: `Your verification code is: ${otp}`,
-            from: tConfigure.mobileno,
-            to: mobileno
-        });
+        // const message = await client.messages.create({
+        //     body: `Your verification code is: ${otp}`,
+        //     from: tConfigure.mobileno,
+        //     to: mobileno
+        // });
 
         let newOtp = new OTP({
             mobileno,
@@ -118,11 +118,11 @@ export const sendOtpForCreateUser = async (req, res, next)=>{
 
         const client = new twilio(tConfigure.accountsid, tConfigure.authtoken);
 
-        const message = await client.messages.create({
-            body: `Your verification code is: ${otp}`,
-            from: tConfigure.mobileno,
-            to: mobileno
-        });
+        // const message = await client.messages.create({
+        //     body: `Your verification code is: ${otp}`,
+        //     from: tConfigure.mobileno,
+        //     to: mobileno
+        // });
 
         let newOtp = new OTP({
             name,
