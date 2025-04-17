@@ -1,5 +1,5 @@
 import NOTIFY from "../model/NOTIFY.js";
-
+import mongoose from "mongoose";
 
 
 export const getNotification = async (req, res, next) =>{
@@ -16,18 +16,37 @@ export const getNotification = async (req, res, next) =>{
     }
 }
 
-export const markAsRead = async (req, res, next) =>{
-    try{
-        const {id} = req.params
+export const markAsRead = async (req, res, next) => {
+    try {
+        const { mongoid } = req;
+        const { id } = req.params;
 
-        if(!id) return res.status(400).json({message:"Please provide notification id."})
+        if (!id) {
+            return res.status(400).json({ message: "Please provide notification id." });
+        }
 
-        const updatedNotify = await NOTIFY.findByIdAndUpdate(id,{$set:{isRead:false}},{new:true})
+        const notification = await NOTIFY.findById(id);
 
-        if(updatedNotify) return res.status(404).json({message:"Notification not found.",status:404})
+        if (!notification) {
+            return res.status(404).json({ status: 404, message: "Notification not found." });
+        }
 
-        return res.status(200).json({message:"Notification updated successfully.",status:200,data:updatedNotify})
-    }catch(err){
-        next(err)
+        if (!notification.to.equals(mongoid)) {
+            return res.status(400).json({ message: "This notification is not for you, so you can't mark it as read." });
+        }
+
+        if (notification.isRead) {
+            return res.status(200).json({ message: "Notification is already marked as read.", status: 200, data: notification });
+        }
+
+        const updatedNotify = await NOTIFY.findByIdAndUpdate(
+            id,
+            { $set: { isRead: true } },
+            { new: true }
+        );
+
+        return res.status(200).json({ message: "Notification updated successfully.", status: 200, data: updatedNotify });
+    } catch (err) {
+        next(err);
     }
-}
+};

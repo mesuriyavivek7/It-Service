@@ -3,6 +3,8 @@ import ISSUE from "../model/ISSUE.js";
 import LOGINMAPPING from "../model/LOGINMAPPING.js";
 import LEAVE from "../model/LEAVE.js";
 import bcrypt from 'bcryptjs'
+import NOTIFY from "../model/NOTIFY.js";
+import { io } from "../index.js";
 
 export const createNewEmployee = async (req, res, next) =>{
     try{
@@ -195,6 +197,24 @@ export const assignEmployeeToIssue = async (req, res, next)=>{
     await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:employeeId}},{new:true})
 
     await EMPLOYEE.findByIdAndUpdate(employeeId,{$addToSet:{assignedIssues:issueId}},{new:true})
+
+    const message = `Issue assigned to employee ${employee.name} on ${new Date().toLocaleString()}`
+
+    const notification = new NOTIFY({
+      from:mongoid,
+      fromType:'admin',
+      to:employeeId,
+      message,
+      toType:'employee',
+      type:'assign_issue'
+    })
+
+    await notification.save()
+
+    io.to(`employee_${employeeId}`).emit("assign_issue", {
+      message,
+      notification,
+    })
 
     return res.status(200).json({message:"Successfully employed assigned to issue.",status:200})
 

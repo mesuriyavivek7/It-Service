@@ -231,7 +231,6 @@ export const getOneIssueForAdmin = async (req, res, next) =>{
 //Get all issues 
 export const getAllIssues = async (req, res, next) =>{
     try{
-
         const {mongoid, userType} = req
 
         if(!mongoid || !userType){
@@ -326,6 +325,31 @@ export const startIssueWorking = async (req, res, next) =>{
 
         const updatedIssue = await ISSUE.findByIdAndUpdate(issueId,{$set:{status:"Ongoing"}},{new:true})
 
+        const admin = await ADMIN.find()
+
+        if(admin.length>0){
+          //Create notification
+
+          const message = `Employee start working on "${issue.issue_description}" issue on ${new Date().toLocaleString()}.`
+
+          const notification = new NOTIFY({
+            from:mongoid,
+            fromType:'employee',
+            to:admin[0]._id,
+            toType:'admin',
+            type:"start_working_issue",
+            message
+          })
+
+          await notification.save()
+
+          io.to(`admin_${admin[0]._id}`).emit("start_working_issue", {
+            message,
+            notification
+          })
+
+        }
+
         return res.status(200).json({message:"Issue status sucessfully changed from pending to ongoing.",data:updatedIssue,status:200})
 
     }catch(err){
@@ -392,8 +416,6 @@ export const verifyResolveIssue = async (req, res, next) =>{
 
        if(!mongoid || !userType) return res.status(401).json({message:"Unauthorized request: Missing user ID or user Type.",status:401})
 
-       if(userType!=='user') return res.status(401).json({message:"You are not allow to complete this service.",status:401})
-
        const { otp } = req.body
 
        const {issueId} = req.params
@@ -404,11 +426,11 @@ export const verifyResolveIssue = async (req, res, next) =>{
 
        if(!issue) return res.status(404).json({message:"Issue is not found.",status:404})
 
-       if(!issue.assignedEmployee) return res.status(404).json({message:"Employee not found for your service.",status:404})
+       if(!issue.assignedEmployee) return res.status(404).json({message:"Employee not found for this service.",status:404})
 
        const employee = await EMPLOYEE.findById(issue.assignedEmployee)
 
-       if(!employee) return res.status(404).json({message:"Employee not found for your service.",status:404})
+       if(!employee) return res.status(404).json({message:"Employee not found for this service.",status:404})
 
        if(!otp) return res.status(400).json({message:"Please provide otp.",status:400})
 
@@ -425,6 +447,44 @@ export const verifyResolveIssue = async (req, res, next) =>{
        await ISSUE.findByIdAndUpdate(issueId,{$set:{status:'Resolved'}})
 
     //  await ISSUE.findByIdAndUpdate(issueId,{$set:{assignedEmployee:null,status:'Resolved'}})
+
+       const admin = await ADMIN.find()
+
+       if(admin.length!==0){
+          let message = `Issue resolved successfully by ${employee.name} on ${new Date().toLocaleString()}`
+
+          const notificationOne = new NOTIFY({
+            to:admin[0]._id,
+            toType:'admin',
+            from:issue.assignedEmployee,
+            fromType:'employee',
+            type:'complete_issue',
+            message,
+          })
+
+          const notificationTwo = new NOTIFY({
+            to:issue.added_by._id,
+            toType:"user",
+            from:issue.assignedEmployee,
+            fromType:'employee',
+            type:'complete_issue',
+            message
+          })
+
+          await notificationOne.save()
+
+          await notificationTwo.save()
+
+          io.to(`admin_${admin[0]._id}`).emit("complete_issue",{
+            notification:notificationOne,
+            message
+          })
+
+          io.to(`user_${issue.added_by._id}`).emit("complete_issue",{
+            notification:notificationTwo,
+            message
+          })
+       }
 
        return res.status(200).json({message:"Service resolved successfully.",data:{otp:dbotp.otp},status:200})
 

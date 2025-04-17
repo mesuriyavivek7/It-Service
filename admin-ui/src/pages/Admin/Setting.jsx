@@ -56,7 +56,7 @@ function Setting() {
           <h1 className="font-medium">Twilio Configuration</h1>
           <button onClick={()=>setOpenEdit(true)} className="cursor-pointer text-themecolor rounded-md flex items-center gap-2"><Edit></Edit> Edit</button>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
            <div className="flex relative flex-col gap-1">
              <label className="text-neutral-600">Account SID</label>
              <input className="border rounded-md border-neutral-200 p-2 outline-none" readOnly type={showSid?"text":"password"} value={TwilioData?.accountsid}></input>

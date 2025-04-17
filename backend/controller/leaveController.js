@@ -1,6 +1,22 @@
 import LEAVE from "../model/LEAVE.js";
 import EMPLOYEE from "../model/EMPLOYEE.js";
 import ISSUE from "../model/ISSUE.js";
+import ADMIN from "../model/ADMIN.js";
+import NOTIFY from "../model/NOTIFY.js";
+import { io } from "../index.js";
+
+const formateDate = (inputDate) =>{
+ 
+  if(!inputDate) return ''
+
+  const date = new Date(inputDate);
+  
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = date.toLocaleString('en-US', { month: 'long' });
+  const year = date.getFullYear();
+
+  return `${day} ${month}, ${year}`;
+}
 
 //For create leave
 export const createLeave = async (req, res, next) =>{
@@ -30,6 +46,30 @@ export const createLeave = async (req, res, next) =>{
         })
 
        await newLeave.save()
+
+       const admin = await ADMIN.find()
+
+       if(admin.length!==0){
+
+          let message = `${employee.name} added leave on ${new Date().toLocaleString()}.`
+
+          const notification = new NOTIFY({
+            to:admin[0]._id,
+            toType:'admin',
+            from:mongoid,
+            fromType:'employee',
+            type:'create_leave',
+            message
+          })
+
+          await notification.save()
+
+          io.to(`admin_${admin[0]._id}`).emit("create_leave",{
+            message,
+            notification
+          })
+
+       }
 
        return res.status(200).json({message:"Leave created successfully.",data:newLeave,status:200})
 
@@ -112,6 +152,24 @@ export const approveLeave = async (req, res, next) => {
 
         await LEAVE.findOneAndUpdate({_id:leaveId,handover_by:mongoid},{$set:{status:'Approved'}})
 
+        let message = `Admin approved your ${leave.leave_type} for the date ${formateDate(leave.form)} on ${new Date().toLocaleString()}`
+
+        const notification = new NOTIFY({
+            to:employee._id,
+            toType:'employee',
+            from:mongoid,
+            fromType:'admin',
+            type:'approve_leave',
+            message
+        })
+
+        await notification.save()
+
+        io.to(`employee_${employee._id}`).emit("approve_leave", {
+            message,
+            notification
+        })
+
         return res.status(200).json({ message: "Leave approved and relevant issues updated successfully.", status: 200 });
     } catch (err) {
         next(err);
@@ -132,6 +190,24 @@ export const rejectLeave = async (req, res, next) =>{
 
         const leave = await LEAVE.findOneAndUpdate({_id:leaveId,handover_by:mongoid},{status:"Rejected"})
         if(!leave) return res.status(404).json({message:"Leave is not found.",status:404})
+
+        const message = `Admin rejected your leave for the date ${formateDate(leave.from)} on ${new Date().toLocaleString()}`
+
+        const notification = new NOTIFY({
+            to:leave.added_by,
+            toType:'employee',
+            from:mongoid,
+            fromType:'admin',
+            message,
+            type:'reject_leave',
+        })
+
+        await notification.save()
+
+        io.to(`employee_${leave.added_by}`).emit("reject_leave", {
+            message,
+            notification
+        })
 
         return res.status(200).json({message:"Leave rejected successfully.",status:200})
         

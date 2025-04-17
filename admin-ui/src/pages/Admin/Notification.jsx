@@ -68,6 +68,7 @@ function Notification({setOpenNotification,notification,setNotification,openNoti
   const {user} = useSelector((state)=>state.auth)
   
   const [loading,setLoading] = useState(false) 
+  const [markAsReadLoading,setMarkAsReadLoading] = useState(false)
 
   const fetchNotifications = async () =>{
     setLoading(true)
@@ -82,6 +83,19 @@ function Notification({setOpenNotification,notification,setNotification,openNoti
     }
   }
 
+  const handleMarkAsRead = async (notificationId) =>{
+     setMarkAsReadLoading(true)
+     try{
+       const response = await api.post(`notify/${notificationId}`)
+       fetchNotifications()
+     }catch(err){
+      console.log(err)
+      toast.error(err?.response?.data?.message || "Something went wrong.")
+     }finally{
+        setMarkAsReadLoading(false)
+     }
+  }
+
   useEffect(()=>{
     fetchNotifications()
 
@@ -89,17 +103,34 @@ function Notification({setOpenNotification,notification,setNotification,openNoti
         socket.emit('join_room',`${user?.userType}_${user?.userId}`)
     }
 
+    //When issue is created
     socket.on('issue_created', (data)=> {
         setNotification(prev => [data.notification, ...prev])
+    })
+
+    //When employee start working on issue
+    socket.on('start_working_issue', (data) => {
+       setNotification(prev => [data.notification, ...prev])
+    })
+
+    //When issue resolved by employee
+    socket.on('complete_issue',(data) => {
+      setNotification(prev => [data.notification, ...prev])
+    })
+
+    //When employee create leave
+    socket.on('create_leave',(data) => {
+     setNotification(prev => [data.notification, ...prev])
     })
     
     return () => {
         socket.off('issue_created')
+        socket.off('start_working_issue')
+        socket.off('complete_issue')
+        socket.off('create_leave')
     }
     
   },[user])  
-
-  console.log(notification)
 
   return (
     <div className={`rounded-md transition-all duration-300 z-50 w-72  bg-white h-10/12 ${openNotification?"right-2":"-right-72"} md:top-22 shadow-lg top-16 absolute`}>
@@ -127,7 +158,9 @@ function Notification({setOpenNotification,notification,setNotification,openNoti
                    {item.message}
                 </div>
                 <div className='w-full place-content-start items-center'>
-                    <button className='text-sm hover:bg-blue-600 transition-colors duration-300 py-1 px-2 bg-blue-500 cursor-pointer rounded-md text-white'>Mark As Read</button>
+                    <button disabled={markAsReadLoading} onClick={()=>handleMarkAsRead(item._id)} className='text-sm hover:bg-blue-600 transition-colors duration-300 py-1 px-2 bg-blue-500 flex justify-center items-center cursor-pointer rounded-md text-white'>
+                      <span>Mark As Read</span>
+                    </button>
                 </div>
                </div>
               ))
