@@ -251,7 +251,7 @@ export const getAllIssues = async (req, res, next) =>{
 
         return res.status(200).json({message:"All issues retrived.",data:allIssues,status:200})
        }else{
-         const filterIssues = await ISSUE.find({status:status}).sort({createdAt: -1})
+         const filterIssues = await ISSUE.find({status:status,added_by:mongoid}).sort({createdAt: -1})
         .populate('address')
         .populate('device')
         .populate('time')
@@ -388,11 +388,11 @@ export const resolveIssue = async (req, res, next) =>{
 
         const otp = generateOTP()
 
-        const message = await client.messages.create({
-            body: `Your verification code is: ${otp}`,
-            from: process.env.TWILIO_PHONE_NUMBER,
-            to: user.mobileno
-        });
+        // const message = await client.messages.create({
+        //     body: `Your verification code is: ${otp}`,
+        //     from: process.env.TWILIO_PHONE_NUMBER,
+        //     to: user.mobileno
+        // });
 
         let newOtp = new OTP({
             mobileno:user.mobileno,

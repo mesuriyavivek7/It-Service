@@ -20,6 +20,12 @@ const adminSchema = new mongoose.Schema({
             },
             message: "Invalid mobile number format.",
         },
+    },
+    profile_pic:{
+        fileName: String,
+        fileSize: String,
+        filePath: String,
+        fileType: String
     }
 },{timestamps:true})
 

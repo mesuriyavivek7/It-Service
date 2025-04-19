@@ -17,6 +17,7 @@ import PreviewBooking from './pages/Admin/PreviewBooking';
 import Service from './pages/Admin/Service';
 import Time from './pages/Admin/Time';
 import Leave from './pages/Admin/Leave';
+import Profile from './pages/Admin/Profile';
 import Setting from './pages/Admin/Setting';
 
 
@@ -75,6 +76,7 @@ function App() {
            <Route path='service' element={<Service></Service>}></Route>
            <Route path='time' element={<Time></Time>}></Route>
            <Route path='leave' element={<Leave></Leave>}></Route>
+           <Route path='profile' element={<Profile></Profile>}></Route>
            <Route path='setting' element={<Setting></Setting>}></Route>
          </Route>
 

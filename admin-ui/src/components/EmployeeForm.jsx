@@ -44,7 +44,7 @@ function EmployeeForm({setIsOpenUserForm, fetchData, user}) {
     
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value.trim(),
+      [name]: value,
     }));
   
     setErrors((prevErrors) => {
