@@ -60,11 +60,16 @@ function Profile() {
         fetchData()
     },[])
 
+    const handleCloseEditPopUp = () =>{
+        setOpenEditPopUp(false)
+        fetchData()
+    }
+
   return (
     <div className='flex w-full gap-4 items-start'>
         {
             openEditPopUp &&
-            <ProfileEdit user={formData}></ProfileEdit>
+            <ProfileEdit user={formData} handleCloseEditPopUp={handleCloseEditPopUp}></ProfileEdit>
         }
         <div className='flex w-1/3 rounded-md bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] flex-col gap-2'>
             <div className='p-4 border-b border-neutral-200'>

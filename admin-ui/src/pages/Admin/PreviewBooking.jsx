@@ -259,7 +259,7 @@ function PreviewBooking() {
                 </div>
                }
 
-               { (issueDetails.status !=="Resolved" && issueDetails.status !=="Ongoing") &&
+               { (issueDetails.status !=="Resolved" && issueDetails.status !=="Ongoing" && issueDetails.status !== "Canceled") &&
                <div className='flex bg-white flex-col rounded-md border-t-3 border-violet-500 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
                  <div className='bg-gradient-to-r flex justify-between p-4 from-violet-200 to-violet-50'>
                     <h1 className='text-lg font-semibold'>Action</h1>

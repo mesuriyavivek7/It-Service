@@ -91,15 +91,18 @@ export const bookingColumns = (handleOpenBookingPreview,handleRemoveEmployee) =>
                     }} className="text-center w-32 flex justify-center items-center text-white hover:bg-red-600 transition-all duration-300 cursor-pointer h-6 rounded-md font-medium bg-red-500">
                     Remove</button>}
                 </div>:
+                params.row.status==="Canceled"?
+                <span className="text-neutral-500">Not Assignable</span>
+                :                
                 <div className="flex justify-start items-center w-full h-full">
-                    <button onClick={(e)=>{
-                        e.stopPropagation();  // Prevent row click event
-                        handleOpenBookingPreview(params.row)
-                    }} className="bg-button flex justify-center items-center p-1.5 cursor-pointer rounded-md h-8 text-white font-medium">
-                        Assign Employee
-                    </button>
-                </div>
-        )
+                  <button onClick={(e)=>{
+                  e.stopPropagation();  // Prevent row click event
+                  handleOpenBookingPreview(params.row)
+                }} className="bg-button flex justify-center items-center p-1.5 cursor-pointer rounded-md h-8 text-white font-medium">
+               Assign Employee
+                </button>
+                </div>          
+               )
     },
     {
         field: 'date',

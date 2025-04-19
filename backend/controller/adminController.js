@@ -68,29 +68,31 @@ export const updateAdmin = async (req, res, next) =>{
 
        if(!mongoid) return res.status(400).json({message:"Unauthorized request: Missing user ID.",status:400})
 
+       const admin = await ADMIN.findById(mongoid)
+
+       if(!admin) return res.status(404).json({message:"Admin not found.",status:404})
+
        const {email, mobileno} = req.body
 
-       if(email){
+       if(email && admin.email!==email){
           const existAdmin = await LOGINMAPPING.findOne({email:req.body.email})
           
           if(existAdmin) return res.status(409).json({message:"Admin is already exist with same email address.",status:409})
        }
 
-       if(mobileno){
+       if(mobileno && admin.mobileno!==mobileno){
         const existAdmin = await LOGINMAPPING.findOne({mobileno:req.body.mobileno})
 
-        if(existAdmin) return res.status(409).json({message:"Admin is alresy exist with same mobile number.",status:409})
+        if(existAdmin) return res.status(409).json({message:"Admin is already exist with same mobile number.",status:409})
        }
 
        const updatedAdmin = await ADMIN.findByIdAndUpdate(mongoid,{$set:{...req.body}},{new:true,runValidators:true})
 
-       if(!updatedAdmin) return res.status(404).json({message:"Admin not found.",status:404})
-
        if(email || mobileno){
-        await LOGINMAPPING.findOne({mongoid},{$set:{email, mobileno}})
+        await LOGINMAPPING.findOneAndUpdate({ mongoid },{ $set: { email, mobileno } },{ new: true })
        }
        
-       return res.status(200).json({message:"Admin updated sucessfully",data:updatedAdmin,status:200})
+       return res.status(200).json({message:"Admin updated successfully",data:updatedAdmin,status:200})
 
     }catch(err){
         next(err)

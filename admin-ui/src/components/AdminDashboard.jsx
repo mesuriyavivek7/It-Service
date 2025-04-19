@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+
+import { logout } from "../redux/action/authAction";
 
 //Importing components
 import Notification from "../pages/Admin/Notification";
@@ -43,6 +45,7 @@ export default function AdminDashboard() {
   const [userDetails,setUserDetails] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const [notification,setNotification] = useState([])
   const [openNotification,setOpenNotification] = useState(false)
@@ -126,9 +129,15 @@ export default function AdminDashboard() {
     };
   }, []);
 
-  const logoutUser = () =>{
-     console.log("logout user")
-     navigate('/')
+  const logoutUser = async () =>{
+     try{
+       const response = await api.get('auth/logout')
+       dispatch(logout())
+       navigate('/')
+     }catch(err){
+       console.log(err)
+       toast.error(err?.response?.data?.message || "Something went wrong.")
+     }
   }
 
   return (
@@ -268,8 +277,8 @@ export default function AdminDashboard() {
 
               {isProfileOpen && 
                <div ref={popupRef} className="absolute z-40 w-30 md:w-40 shadow-md rounded-md bg-white top-[140%] right-0 flex flex-col ">
-                 <Link to="/admin/profile"><div className="flex hover:bg-lightgray p-2 items-center gap-2 text-gray-500"><span className="text-blue-500"><AccountCircleIcon></AccountCircleIcon></span> Profile</div></Link>
-                 <div onClick={logoutUser} className="flex hover:bg-lightgray p-2 items-center gap-2 text-gray-500"><span className="text-red-500"><LogoutIcon></LogoutIcon></span> Logout</div>
+                 <Link to="/admin/profile"><div className="flex hover:bg-gray-100 p-2 items-center gap-2 text-gray-500"><span className="text-blue-500"><AccountCircleIcon></AccountCircleIcon></span> Profile</div></Link>
+                 <div onClick={logoutUser} className="flex hover:bg-gray-100 p-2 items-center gap-2 text-gray-500"><span className="text-red-500"><LogoutIcon></LogoutIcon></span> Logout</div>
               </div>
               }
             </div>
