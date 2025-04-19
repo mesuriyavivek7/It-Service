@@ -388,11 +388,11 @@ export const resolveIssue = async (req, res, next) =>{
 
         const otp = generateOTP()
 
-        // const message = await client.messages.create({
-        //     body: `Your verification code is: ${otp}`,
-        //     from: process.env.TWILIO_PHONE_NUMBER,
-        //     to: user.mobileno
-        // });
+        const message = await client.messages.create({
+            body: `Your verification code is: ${otp}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: user.mobileno
+        });
 
         let newOtp = new OTP({
             mobileno:user.mobileno,
@@ -524,3 +524,47 @@ export const getAllIssueForAdmin = async (req, res, next) =>{
         next(err)
     }
 }
+
+
+export const getDashboardSummary = async (req, res, next) => {
+    try {
+      const now = new Date();
+      const startOfThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+  
+      // Total users
+      const total = await ISSUE.countDocuments();
+  
+      // Users created this month
+      const thisMonthCount = await ISSUE.countDocuments({
+        createdAt: { $gte: startOfThisMonth }
+      });
+  
+      // Users created last month
+      const lastMonthCount = await ISSUE.countDocuments({
+        createdAt: { $gte: startOfLastMonth, $lt: startOfThisMonth }
+      });
+  
+      // Calculate change
+      let change = 0;
+      let isPositive = true;
+  
+      if (lastMonthCount === 0) {
+        change = thisMonthCount > 0 ? 100 : 0;
+        isPositive = thisMonthCount >= 0;
+      } else {
+        change = ((thisMonthCount - lastMonthCount) / lastMonthCount) * 100;
+        isPositive = change >= 0;
+        change = Math.abs(Math.round(change)); // Keep it positive for output
+      }
+  
+      res.status(200).json({
+        total,
+        change,
+        isPositive
+      });
+    } catch (err) {
+      next(err);
+    }
+  };

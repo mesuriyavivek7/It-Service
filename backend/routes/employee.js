@@ -1,5 +1,5 @@
 import express from 'express'
-import { assignEmployeeToIssue, checkAvailibiltyOfEmployee, createNewEmployee, getAllEmployee, getAllIssuesForEmployee, getIssuesByEmployeeId, getOneEmployee, removeEmployeeFromIssue, updateEmployee, updateEmployeeFromAdmin } from '../controller/employeeController.js'
+import { assignEmployeeToIssue, checkAvailibiltyOfEmployee, createNewEmployee, getAllEmployee, getAllIssuesForEmployee, getDashboardSummary, getIssuesByEmployeeId, getOneEmployee, removeEmployeeFromIssue, updateEmployee, updateEmployeeFromAdmin } from '../controller/employeeController.js'
 import { verifyToken, verifyAdmin } from '../middlewares/authMiddleware.js'
 
 const app = express.Router()
@@ -34,5 +34,8 @@ app.put('/:empId',verifyToken,verifyAdmin,updateEmployeeFromAdmin)
 
 //For get all issues
 app.get('/getallIssue',verifyToken,getAllIssuesForEmployee)
+
+//For get Dashboard summery for employee
+app.get('/dashborad-summery',verifyToken, getDashboardSummary)
 
 export default app

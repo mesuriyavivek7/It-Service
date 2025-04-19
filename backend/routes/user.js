@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, getAllUser, getUser, updateUser, updateUserFromApplication } from '../controller/userController.js'
+import { createUser, getAllUser, getDashboardSummary, getUser, updateUser, updateUserFromApplication } from '../controller/userController.js'
 import { verifyToken } from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/multer.js'
 
@@ -21,9 +21,8 @@ app.get('/',verifyToken, getAllUser)
 //For Get only one user
 app.get('/getone',verifyToken, getUser) 
 
-
-
-
+//For get User dashboard summary
+app.get('/dashboard-summery',verifyToken,getDashboardSummary)
 
 
 

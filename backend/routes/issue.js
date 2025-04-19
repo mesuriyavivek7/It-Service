@@ -1,5 +1,5 @@
 import express from 'express'
-import { cancelIssue, createIssue, getAllIssueForAdmin, getAllIssues, getOneIssue, getOneIssueForAdmin, resolveIssue, startIssueWorking, verifyResolveIssue } from '../controller/issueController.js'
+import { cancelIssue, createIssue, getAllIssueForAdmin, getAllIssues, getDashboardSummary, getOneIssue, getOneIssueForAdmin, resolveIssue, startIssueWorking, verifyResolveIssue } from '../controller/issueController.js'
 import { verifyAdmin, verifyToken } from '../middlewares/authMiddleware.js'
 import upload from '../middlewares/multer.js'
 import fs from 'fs'
@@ -41,6 +41,7 @@ app.post('/sendotp/resolveissue/:issueId',verifyToken,resolveIssue)
 //Verify otp for resolve issue
 app.post('/verifyotp/resolveissue/:issueId',verifyToken,verifyResolveIssue)
 
-
+//For get issue dashboard summery
+app.get('/dashboard-summery',verifyToken, getDashboardSummary)
 
 export default app

@@ -102,8 +102,17 @@ export const getAllLeaves = async (req, res, next)=>{
       if(!mongoid || !userType){
         return res.status(400).json({ message: "Unauthorized request: Missing user ID or user Type", status: 400 });
       }
-      
-      const allLeaves = await LEAVE.find()
+
+      const {leaveType} = req.query
+  
+      let allLeaves = []
+
+      if(leaveType){
+        allLeaves = await LEAVE.find({status:leaveType}).sort({createdAt:-1})
+      }else{
+        allLeaves = await LEAVE.find().sort({createdAt:-1})
+      }
+    
 
       return res.status(200).json({message:"All leaves retrived.",data:allLeaves,status:200})
     }catch(err){

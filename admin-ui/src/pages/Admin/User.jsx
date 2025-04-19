@@ -84,7 +84,7 @@ function User() {
         </button>
 
         <div className='flex items-center gap-2'>
-            <div className='flex border border-grayborder gap-2 rounded-md py-1.5 px-2 items-center'>
+            <div className='flex border md:w-auto w-36 border-grayborder gap-2 rounded-md py-1.5 px-2 items-center'>
                 <Search className='w-5 h-5 text-navtext'></Search>
                 <input onChange={(e)=>setSearchQuery(e.target.value)} value={searchQuery} className='outline-none placeholder:text-navtext placeholder:text-sm' placeholder='Search User...'></input>
             </div>
