@@ -9,6 +9,7 @@ import api from '../../api';
 import { toast } from 'react-toastify';
 
 import ProfileEdit from '../../components/ProfileEdit';
+import ChangePassword from '../../components/ChangePassword';
 
 function Profile() {
     const [formData,setFormData] = useState({
@@ -65,11 +66,20 @@ function Profile() {
         fetchData()
     }
 
+    const handleCloseChangePassPopUp = () =>{
+        setOpenPassPopUp(false)
+        fetchData()
+    }
+
   return (
     <div className='flex w-full gap-4 items-start'>
         {
             openEditPopUp &&
             <ProfileEdit user={formData} handleCloseEditPopUp={handleCloseEditPopUp}></ProfileEdit>
+        }
+        {
+            openPassPopUp && 
+            <ChangePassword handleCloseChangePassPopUp={handleCloseChangePassPopUp}></ChangePassword>
         }
         <div className='flex w-1/3 rounded-md bg-white shadow-[0_2px_10px_rgba(0,0,0,0.08)] flex-col gap-2'>
             <div className='p-4 border-b border-neutral-200'>
@@ -110,7 +120,7 @@ function Profile() {
             </div>
             <div className='flex p-4 justify-center items-center gap-2'>
                 <button onClick={()=>setOpenEditPopUp(true)} className='bg-blue-500 hover:bg-white hover:text-blue-500 hover:border cursor-pointer hover:border-blue-500 transition-colors duration-300 rounded-md text-white p-1.5 w-36'>Edit</button>
-                <button className='bg-button hover:bg-white hover:text-button cursor-pointer hover:border-button hover:border transition-colors duration-300 rounded-md text-white p-1.5 w-36'>Change Password</button>
+                <button onClick={()=>setOpenPassPopUp(true)} className='bg-button hover:bg-white hover:text-button cursor-pointer hover:border-button hover:border transition-colors duration-300 rounded-md text-white p-1.5 w-36'>Change Password</button>
             </div>
         </div>
     </div>

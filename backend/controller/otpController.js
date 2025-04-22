@@ -5,7 +5,7 @@ import LOGINMAPPING from "../model/LOGINMAPPING.js";
 import USER from "../model/USER.js";
 import EMPLOYEE from "../model/EMPLOYEE.js";
 import TWILIO from "../model/TWILIO.js";
-
+import bcrypt from 'bcryptjs'
 
 
 
@@ -103,12 +103,12 @@ export const verifyOtp = async (req, res, next) =>{
 //Send otp for sign up user
 export const sendOtpForCreateUser = async (req, res, next)=>{
     try{
-        const {name, mobileno} = req.body
-        if(!name || !mobileno) return res.status(400).json({message:"Please provide all required fields.",status:400})
+        const {email,mobileno} = req.body
+        if(!mobileno) return res.status(400).json({message:"Please provide all required fields.",status:400})
 
-        const existUser = await LOGINMAPPING.findOne({mobileno})
+        const existUser = await LOGINMAPPING.findOne({mobileno,email})
 
-        if(existUser) return res.status(409).json({message:"User is already exist with same mobileno.",status:409})
+        if(existUser) return res.status(409).json({message:"User is already exist with same mobileno or email address.",status:409})
 
         const otp = generateOTP()
 
@@ -125,14 +125,13 @@ export const sendOtpForCreateUser = async (req, res, next)=>{
         // });
 
         let newOtp = new OTP({
-            name,
             mobileno,
             otp
         })
 
         await newOtp.save()
 
-        return res.status(200).json({message:"Otp Sended for register new user successfully",data:{otp,mobileno,name},status:200})
+        return res.status(200).json({message:"Otp Sended for register new user successfully",data:{otp,mobileno,email},status:200})
 
     }catch(err){
         next(err)
@@ -142,9 +141,9 @@ export const sendOtpForCreateUser = async (req, res, next)=>{
 //Verify otp for sign up user
 export const verifyOtpForCreateUser = async (req, res, next)=>{
     try{
-        const {mobileno,otp} = req.body
+        const {name,email,password,mobileno,otp} = req.body
 
-        if(!mobileno || !otp) return res.status(400).json({message:"Please provide all required fields.",status:400})
+        if(!mobileno || !otp || !email || !password || !name) return res.status(400).json({message:"Please provide all required fields.",status:400})
 
         const dbotp = await OTP.findOne({mobileno})
 
@@ -152,21 +151,28 @@ export const verifyOtpForCreateUser = async (req, res, next)=>{
 
         if(dbotp.otp!==otp) return res.status(400).json({message:"Invalid OTP. Please try again.",data:false,status:400})
 
-        await OTP.findOneAndDelete({mobileno})
+        const saltRounds = 10; // The higher the number, the stronger the hash
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        let name = dbotp.name
+        //Trans - 1
+        await OTP.findOneAndDelete({mobileno})
         
+        //Trans - 2
         const newUser = new USER({
             name,
+            email,
             mobileno
         })
 
         await newUser.save()
 
+        //Trans - 3
         const newLoginMap = new LOGINMAPPING({
+            email,
             mobileno,
             userType:'user',
-            mongoid:newUser._id
+            mongoid:newUser._id,
+            password:hashedPassword
         })
 
         await newLoginMap.save()

@@ -73,11 +73,9 @@ function ProfileEdit({user,handleCloseEditPopUp}) {
     }
   }
 
-  console.log('errors--->',errors)
-
   return (
     <div className='fixed z-50 inset-0 flex items-center justify-center bg-black/40 bg-opacity-50'>
-        <div className='bg-white w-96 rounded-md  flex flex-col'>
+        <div className='bg-white w-96 rounded-md flex flex-col'>
            <div className='p-4 flex justify-between items-center border-b border-neutral-200'>
              <h1 className='font-medium'>Edit Information</h1>
              <X onClick={handleCloseEditPopUp} className='text-red-500 cursor-pointer hover:text-red-600'></X>

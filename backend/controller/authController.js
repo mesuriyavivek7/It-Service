@@ -60,6 +60,42 @@ export const validateUser = async (req, res, next) =>{
    }
 }
 
+export const changeCurrentPassword = async (req, res, next) =>{
+   try{
+
+      const {mongoid, userType} = req
+      if(!mongoid || !userType){
+          return res.status(400).json({ message: "Unauthorized request: Missing user ID or user Type", status: 400 });
+      }
+
+      const {currentPassword, newPassword, confirmPassword} = req.body
+
+      if(!currentPassword || !newPassword || !confirmPassword) return res.status(400).json({message:"Please provide all required fields.",status:400})
+
+      const user = await LOGINMAPPING.findOne({mongoid})
+
+      if(!user) return res.status(404).json({message:"User not found.",status:404})
+
+      const isPasswordCorrect =await bcryptjs.compare(currentPassword,user.password)
+
+      console.log(isPasswordCorrect)
+
+      if(!isPasswordCorrect) return res.status(401).json({message:"Entered current password is incorrect.",status:401})
+
+      if(confirmPassword!==newPassword) return res.status(400).json({message:"Confirm password is not matched with current password.",status:400})
+
+      const saltRounds = 10;
+      const hashedPassword = await bcryptjs.hash(confirmPassword, saltRounds);
+
+      await LOGINMAPPING.findOneAndUpdate({mongoid},{$set:{password:hashedPassword}})
+
+      return res.status(200).json("Password changed successfully.")
+
+   }catch(err){
+      next(err)
+   }
+} 
+
 
 export const logoutPortal = async (req, res, next) => {
    try {
