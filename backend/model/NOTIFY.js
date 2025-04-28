@@ -27,6 +27,7 @@ const notificationSchema = new mongoose.Schema({
     type: String,
     enum: [
       "issue_created",
+      "issue_cancel",
       "assign_issue",
       "start_working_issue",
       "complete_issue",

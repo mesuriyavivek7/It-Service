@@ -21,6 +21,11 @@ const serviceSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         required:true,
         ref:'admin'
+    },
+    status:{
+        type:Boolean,
+        default:true,
+        required:true
     }
 },{timestamps:true})
 

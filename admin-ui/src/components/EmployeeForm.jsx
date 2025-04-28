@@ -89,14 +89,13 @@ function EmployeeForm({setIsOpenUserForm, fetchData, user}) {
     });
   };
   
- console.log(errors)
-  
   const handleSubmitdata = async () =>{
 
     if(validateData()){
       setLoading(true)
       try{
          const response = await api.post('/employee',{name:formData.name,mobileno:`+${formData.mobileno}`,email:formData.email,password:formData.password})
+         const emailResponse = await api.post(`/mail/send-employee-register/${response.data.data._id}`,{password:formData.password})
          await fetchData()
          setFormData(
           {name:'',

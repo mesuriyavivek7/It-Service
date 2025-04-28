@@ -3,8 +3,8 @@ import React, { useState } from 'react'
 import { toast } from 'react-toastify'
 import api from '../api'
 
-function ServiceForm({handleClose,service}) {
 
+function ServiceForm({handleClose,service}) {
   const [file,setFile] = useState(null)
   const [preview,setPreview] = useState(null)
   const [errors,setErrors] = useState({})
@@ -91,23 +91,62 @@ function ServiceForm({handleClose,service}) {
       }
   }
 
+  const handleAdd = async () =>{
+    try{
+      let fileData = new FormData()
+       fileData.append("service_name",formData.service_name)
+       fileData.append('price',formData.price)
+       if(preview && file){
+         fileData.append('service',file)
+       }
+
+       const res = await api.post(`service`,fileData,{
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      toast.success("New Service added successfully.")
+      handleClose()
+    }catch(err){
+      console.log(err)
+      toast.error(err?.response?.data?.message || "Something went wrong.")
+    }
+  }
+
+
+  const getLabelText = () => {
+    if (service) return "Change Image";
+    if (preview && file) return "Change Image";
+    return "Choose Image";
+  };
+
 
   return (
     <div className='fixed z-50 inset-0 flex items-center justify-center bg-black/40 bg-opacity-50'>
         <div className='bg-white w-96 rounded-md p-4 gap-4 flex flex-col'>
              <div className='flex justify-between items-center'>
-                 <h1 className='text-xl font-medium'>Edit Service</h1>
+                 <h1 className='text-xl font-medium'>{service ? "Edit Service" : "Add Service"}</h1>
                  <X onClick={handleClose} className='text-red-500 cursor-pointer'></X>
              </div>
              <div className='flex mb-2 flex-col gap-2'>
                 <span className='text-sm font-medium'>Service Image</span>
                 <div className='w-full flex items-center justify-center'>
-                    <div className='w-52 h-36'>
-                        <img src={preview?preview:`${import.meta.env.VITE_APP_API_IMAGE_URL}/${service?.service_image?.filePath}`} className='w-full h-40'></img>
-                    </div>
+                    {
+                      (!service && !preview && !file) ?
+                      <div className='w-52 h-36 flex justify-center items-center'>
+                        <span>No Image</span>
+                      </div> :
+                      (!service && preview && file) ?
+                      <div className='w-52 h-36'>
+                        <img src={preview} className='w-full h-40'></img>
+                      </div> :
+                      <div className='w-52 h-36'>
+                         <img src={preview?preview:`${import.meta.env.VITE_APP_API_IMAGE_URL}/${service?.service_image?.filePath}`} className='w-full h-full'></img>
+                      </div>
+                    }
                 </div>
                 <input onChange={handleFileChange} id='image' type='file' className='hidden'></input>
-                <label htmlFor='image' className='p-1  cursor-pointer px-2 text-sm border-bordercolor/25 border rounded-md'>Change Image</label>
+                <label htmlFor='image' className='p-1  cursor-pointer px-2 text-sm border-bordercolor/25 border rounded-md'>{getLabelText()}</label>
              </div>
              <div className='flex mb-2 flex-col gap-4'>
               <div className='flex flex-col gap-2'>
@@ -125,8 +164,9 @@ function ServiceForm({handleClose,service}) {
                   {errors.price && <span className='text-sm text-red-500'>{errors.price}</span>}
                 </div>
               </div>
+
              </div>
-             <button onClick={handleSubmit} className='bg-button cursor-pointer text-white font-medium p-2 rounded-md'>Save Changes</button>
+             <button onClick={service?handleSubmit:handleAdd} className='bg-button cursor-pointer text-white font-medium p-2 rounded-md'>{service ? "Save Changes" : "Add"}</button>
         </div>
     </div>
   )

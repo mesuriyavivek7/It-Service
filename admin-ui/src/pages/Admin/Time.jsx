@@ -82,7 +82,7 @@ function Time() {
       }
       {
         openConfirm && 
-        <DeleteModal handleCancel={handleCloseConfirmModal} handleDelete={handleRemoveTime} modalType={"Time"}></DeleteModal>
+        <DeleteModal handleCancel={handleCloseConfirmModal} handleDelete={handleRemoveTime} modalType={"Time"} action={'delete'}></DeleteModal>
       }
      <div className='bg-white items-center flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
 

@@ -6,18 +6,26 @@ import api from '../../api'
 import { LoaderCircle, Search } from 'lucide-react'
 import { RefreshCcw } from 'lucide-react'
 import { FilePenLine } from 'lucide-react';
+import { Plus } from 'lucide-react'
+import { ChevronDown } from 'lucide-react';
+import { ChevronUp } from 'lucide-react';
+
 
 //Importing components
 import ServiceForm from '../../components/ServiceForm'
+import DeleteModal from '../../components/DeleteModal'
 
 
 function Service() {
 
   const [service,setService] = useState([])
+  const [filterService,setFilterService] = useState([])
   const [searchQuery,setSearchQuery] = useState('')
   const [loading,setLoading] = useState(false)
   const [selectedService,setSelectedService] = useState(null)
   const [openPopUp,setOpenPopUp] = useState(false)
+  const [openActive,setOpenActive] = useState(null)
+  const [openDeleteModal,setOpenDeleteModal] = useState(false)
 
   const formatDate =(date) => {
    if(!date) return ''
@@ -58,6 +66,54 @@ function Service() {
     fetchData()
   }
 
+  const handleEnableService = async (id) =>{
+    try{
+      const response = await api.post(`/service/enable-service/${id}`)
+      await fetchData()
+      setOpenActive(false)
+      toast.success("Service enable successfully.")
+    }catch(err){
+      toast.error(err?.response?.data?.message || "Something went wrong.")
+    }
+  }
+
+  const handleDisableService = async () =>{
+   try{
+     const response = await api.post(`/service/disable-service/${selectedService._id}`)
+     handleCloseDeleteModal()
+     toast.success("Service disabled successfully.")
+   }catch(err){
+    toast.error(err?.response?.data?.message || "Something went wrong.")
+   }
+  }
+
+  const handleOpenDeleteModal = (item) =>{
+    setOpenDeleteModal(true)
+    setSelectedService(item)
+  }
+
+  const handleCloseDeleteModal = () =>{
+    setOpenActive(false)
+    setOpenDeleteModal(false)
+    fetchData()
+  }
+
+  useEffect(()=>{
+    if(searchQuery){
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      const filtered = service.filter((user) =>
+        Object.values(user).some(
+          (value) =>
+            typeof value === "string" &&
+            value.toLowerCase().includes(lowerCaseQuery)
+        )
+      );
+      setFilterService(filtered);
+    }else{
+      setFilterService(service)
+    }
+  },[searchQuery,service])
+
 
   return (
     <div className='w-full flex flex-col gap-4 h-full'>
@@ -65,9 +121,16 @@ function Service() {
          openPopUp && 
          <ServiceForm service={selectedService} handleClose={handleClose}></ServiceForm>
        }
+       {
+        openDeleteModal &&
+        <DeleteModal handleCancel={handleCloseDeleteModal} handleDelete={handleDisableService} modalType={'service'} action={'disable'}></DeleteModal>
+       }
        <div className='bg-white items-center flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
 
-          <h1 className='text-black text-lg font-medium'>Booking Services</h1>
+          <button onClick={()=>setOpenPopUp(true)} className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
+            <Plus className='w-4 h-4'></Plus>
+            <span>Add Service</span>
+          </button>
 
           <div className='flex items-center gap-2'>
             <div className='flex md:w-auto w-36 border border-grayborder gap-2 rounded-md py-1.5 px-2 items-center'>
@@ -89,9 +152,22 @@ function Service() {
             ) :
             (
                <div className='w-full h-full grid grid-cols-1 md:grid-cols-3 items-start gap-4'>
-               {service.map((item)=>(
+               {filterService.map((item,index)=>(
                 
-                  <div className='flex md:overflow-hidden rounded-md border border-neutral-200 shadow flex-col'>
+                  <div key={index} className='flex relative md:overflow-hidden rounded-md border border-neutral-200 shadow flex-col'>
+                      <div className={`absolute text-sm rounded-md text-white top-2 right-2 ${item.status?"bg-green-400":"bg-red-500"}`}>
+                        <div onClick={()=>setOpenActive((prev)=> !prev?item._id:null)} className='flex p-1.5  items-center gap-1'>
+                         {item.status?"Active":"Inactive"} {openActive===item._id ? <ChevronUp className='w-4 h-4 cursor-pointer'></ChevronUp> : <ChevronDown className='w-4 h-4 cursor-pointer'></ChevronDown> } 
+                        </div>
+                        <div className={`w-full ${openActive===item._id?"h-8 p-1.5":"h-0"} transition-all duration-300 cursor-pointer ${item.status?"bg-red-500":"bg-green-500"} rounded-b-md`}>
+                          {
+                            item.status ? 
+                            <span onClick={()=>handleOpenDeleteModal(item)}>Disable</span>
+                            :<span onClick={()=>handleEnableService(item._id)}>Enable</span>
+                          }
+                        </div>
+                      </div>
+
                       <img className='h-80' src={`${import.meta.env.VITE_APP_API_IMAGE_URL}/${item?.service_image?.filePath}`} alt='service image'>
                       </img>
                       <div className='p-4 bg-white border-t border-neutral-200 flex flex-col gap-2'>
