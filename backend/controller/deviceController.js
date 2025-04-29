@@ -45,7 +45,7 @@ export const getAllDevice = async (req, res, next) =>{
 
         const devices = await DEVICE.find({added_by:mongoid})
 
-        return res.status(200).json({message:'All device retrived',data:devices})
+        return res.status(200).json({message:'All device retrived',data:devices,status:200})
         
     }catch(err){
         next(err)
