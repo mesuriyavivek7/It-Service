@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
-import EmployeeForm from "../../components/EmployeeForm";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 //Importing data
 import { employeeColumns, fetchEmployeeData } from "../../data/employeeData";
@@ -13,11 +13,11 @@ import { Search } from "lucide-react";
 import { RefreshCcw } from "lucide-react";
 
 function Employee() {
+  const navigate = useNavigate()
   const [employee, setEmployee] = useState([]);
   const [filterEmployee, setFilterEmployee] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isOpenUserForm, setIsOpenUserForm] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchData = async () => {
@@ -53,31 +53,20 @@ function Employee() {
     fetchData();
   }, []);
 
-  const handleOpenEditUser = (data) => {
-    if (data) {
-      setSelectedUser(data);
-      setIsOpenUserForm(true);
-    }
-  };
+  const handleRedirectAddUser = () =>{
+    navigate('/admin/addemployee')
+  }
+ 
+  const handleRedirectEditUser= (data) =>{
+     console.log("state data---->",data)
+     navigate('/admin/addemployee',{state:data})
+  }
 
-  const handleCloseEditUser = () => {
-    setSelectedUser(null);
-  };
-
-  useEffect(() => {
-    if (!isOpenUserForm) {
-      handleCloseEditUser();
-    }
-  }, [isOpenUserForm]);
 
   return (
     <div className='flex h-full flex-col gap-4'>
-     {
-      isOpenUserForm && 
-      <EmployeeForm user={selectedUser} setIsOpenUserForm={setIsOpenUserForm} fetchData={fetchData}></EmployeeForm>
-     }
      <div className='bg-white flex justify-between rounded-md p-4 shadow-[0_2px_10px_rgba(0,0,0,0.08)]'>
-        <button onClick={()=>setIsOpenUserForm(true)} className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
+        <button onClick={()=>handleRedirectAddUser()} className='bg-button cursor-pointer rounded-md py-1.5 px-2 text-[14px] text-white font-medium flex gap-2 items-center'>
             <Plus className='w-4 h-4'></Plus>
             <span>Add Employee</span>
         </button>
@@ -107,7 +96,7 @@ function Employee() {
           }}>
            <DataGrid
             rows={filterEmployee}
-            columns={employeeColumns(handleOpenEditUser)}
+            columns={employeeColumns(handleRedirectEditUser)}
             loading={loading}
             rowHeight={70}
             initialState={{

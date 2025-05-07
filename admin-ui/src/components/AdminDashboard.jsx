@@ -30,6 +30,7 @@ import PermIdentityOutlinedIcon from '@mui/icons-material/PermIdentityOutlined';
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 import { Clock } from 'lucide-react';
+import { UserCog } from 'lucide-react';
 import { Settings } from 'lucide-react';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
@@ -183,6 +184,10 @@ export default function AdminDashboard() {
                 <span className={`${isActive('leave') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><ExitToAppIcon style={{fontSize:'1.5rem'}}></ExitToAppIcon></span>
                 {isMenuOpen && <span className={`${isActive("leave") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Leave</span>}
              </div>
+             <div onClick={()=>handleNavigate('/admin/empconfigure')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
+                <span className={`${isActive('empconfigure') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><UserCog style={{fontSize:'1.5rem'}}></UserCog></span>
+                {isMenuOpen && <span className={`${isActive("empconfigure") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Emp Configure</span>}
+             </div>
              <div onClick={()=>handleNavigate('/admin/setting')} className={`group flex hover:text py-3 px-6 cursor-pointer items-center gap-2`}>
                 <span className={`${isActive('setting') ? "text-white" : "text-navtext"} group-hover:text-white transition-all duration-300`}><Settings style={{fontSize:'1.5rem'}}></Settings></span>
                 {isMenuOpen && <span className={`${isActive("setting") ? "text-white" : "text-navtext"} group-hover:text-white text-base transition-all duration-300`}>Setting</span>}
@@ -229,6 +234,10 @@ export default function AdminDashboard() {
             <div onClick={()=>handleNavigate('/admin/leave')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('leave') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><ExitToAppIcon style={{fontSize:'1.2rem'}}></ExitToAppIcon></span>
                <span className={`${isActive("leave") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Leave</span>
+            </div>
+            <div onClick={()=>handleNavigate('/admin/empconfigure')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
+               <span className={`${isActive('empconfigure') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><UserCog style={{fontSize:'1.2rem'}}></UserCog></span>
+               <span className={`${isActive("empconfigure") ? "text-white" : "text-navtext"} group-hover:text-white font-medium text-base`}>Emp Configure</span>
             </div>
             <div onClick={()=>handleNavigate('/admin/setting')} className={`group flex hover:text-navtext py-2 cursor-pointer px-8 items-center gap-2`}>
                <span className={`${isActive('setting') ? "text-white" : "text-navtext group-hover:text-white"} transition-all duration-300 `}><Settings style={{fontSize:'1.2rem'}}></Settings></span>

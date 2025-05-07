@@ -21,7 +21,7 @@ const formatDate= (timestamp) => {
 
 
 
-export const employeeColumns = (handleOpenEditUser) => [
+export const employeeColumns = (handleRedirectEditUser) => [
     {
         field: 'name',
         headerClassName: 'super-app-theme--header',
@@ -32,7 +32,7 @@ export const employeeColumns = (handleOpenEditUser) => [
           <div className='flex items-center h-full w-full px-2 justify-start'>
             <div className="flex items-center gap-3">
                 <img src={EMPLOYEE} alt='person' className='w-9 h-9 rounded-full'></img>
-                <span>{params.value}</span>
+                <span>{params.row.firstName} {params.row.lastName}</span>
             </div>
         </div>
         )
@@ -90,7 +90,7 @@ export const employeeColumns = (handleOpenEditUser) => [
         renderCell: (params) =>(
           <div className="flex items-center justify-center w-full h-full gap-2">
              <Tooltip title='Edit' arrow>
-             <div onClick={()=>handleOpenEditUser(params.row)} className="bg-green-600 w-7 h-7 cursor-pointer rounded-full flex justify-center items-center">
+             <div onClick={()=>handleRedirectEditUser(params.row)} className="bg-green-600 w-7 h-7 cursor-pointer rounded-full flex justify-center items-center">
                <Pencil data-tooltip-content="Edit" className="text-white w-4 h-4"></Pencil>
               </div>
             </Tooltip>
@@ -111,7 +111,7 @@ export const assignEmployeeColumn = [
           <div className='flex items-center h-full w-full px-2 justify-start'>
             <div className="flex items-center gap-3">
                 <img src={EMPLOYEE} alt='person' className='w-9 h-9 rounded-full'></img>
-                <span>{params.value}</span>
+                <span>{params.row.firstName} {params.row.lastName}</span>
             </div>
         </div>
         )

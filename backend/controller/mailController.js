@@ -101,14 +101,14 @@ export const sendMailToEmployee = async (req ,res, next)=>{
           <div class="email-container">
             <h2>Welcome to It Service!</h2>
         
-            <p>Hi <strong>${existEmp.name}</strong>,</p>
+            <p>Hi <strong>${existEmp.firstName} ${existEmp.lastName}</strong>,</p>
         
             <p>We are excited to have you join as a Technician. Below are your account details:</p>
         
             <table>
               <tr>
                 <td><strong>Name</strong></td>
-                <td>${existEmp.name}</td>
+                <td>${existEmp.firstName} ${existEmp.lastName}</td>
               </tr>
               <tr>
                 <td><strong>Email</strong></td>

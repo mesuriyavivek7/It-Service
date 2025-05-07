@@ -92,6 +92,7 @@ import leaveRoute from './routes/leave.js'
 import twilioRoute from './routes/twilio.js'
 import notifyRoute from './routes/notify.js'
 import mailRoute from './routes/mail.js'
+import empConfigureRoute from './routes/empconfiguration.js'
 
 app.use('/api/otp', otpRoute)
 app.use('/api/user', userRoute)
@@ -107,6 +108,7 @@ app.use('/api/leave', leaveRoute)
 app.use('/api/twilio', twilioRoute)
 app.use('/api/notify',notifyRoute)
 app.use('/api/mail',mailRoute)
+app.use('/api/empconfigure',empConfigureRoute)
 
 app.get("/", (req, res) => {
   res.send("Bahut maza aa raha hai 🥳");

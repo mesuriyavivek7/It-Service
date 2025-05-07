@@ -10,10 +10,10 @@ export const createNewEmployee = async (req, res, next) =>{
     try{
        const {mongoid, userType} = req
        if(!mongoid || !userType) return res.status(401).json({ message: "Unauthorized request: Missing user ID or user Type", status: 400 });
+       console.log(req.body)
+       const {employeeCode, firstName, lastName, branch, email, mobileno, password,dateOfBirth, gender, HireDate, departmentId, designationId, reportingToId, salary, adharCard, panCard, address1, address2, area, city, state, pincode, maritalStatus, bloodGroup, emergencyNumber, emergencyContactPerson} = req.body
 
-       const {name, email, mobileno, password} = req.body
-
-       if(!name || !email || !mobileno || !password) res.status(400).json({message:"Please provide all required fields.",status:400})
+       if(!employeeCode || !firstName || !lastName || !branch || !dateOfBirth || !gender || !departmentId || !designationId  || !salary || !adharCard || !panCard || !address1 || !area || !city || !state || !pincode || !maritalStatus || !bloodGroup || !emergencyNumber || !emergencyContactPerson || !email || !mobileno || !password) return res.status(400).json({message:"Please provide all required fields.",status:400})
 
        const checkEmail = await LOGINMAPPING.findOne({email})
 
@@ -21,12 +21,42 @@ export const createNewEmployee = async (req, res, next) =>{
  
        const checkMobileno = await LOGINMAPPING.findOne({mobileno})
 
-       if(checkMobileno) return res.status(409).json({message:"Mobile no is already exist with same mobile no."})
+       if(checkMobileno) return res.status(409).json({message:"Mobile no is already exist with same mobile no.",status:409})
+
+       const checkAdhar = await EMPLOYEE.findOne({adharCard})
+
+       if(checkAdhar) return res.status(409).json({message:"Duplicacy in adharcard.",status:409})
+
+       const checkPancard = await EMPLOYEE.findOne({panCard})
+
+       if(checkPancard) return res.status(409).json({message:"Duplicacy in pancard",status:409})
 
        const newEmployee = new EMPLOYEE({
-         name,
+         employeeCode,
+         firstName,
+         lastName,
          email,
          mobileno,
+         gender,
+         dateOfBirth,
+         HireDate,
+         departmentId,
+         designationId,
+         reportingToId,
+         salary,
+         branch,
+         adharCard,
+         panCard,
+         address1,
+         address2,
+         area,
+         city,
+         state,
+         pincode,
+         maritalStatus,
+         bloodGroup,
+         emergencyNumber,
+         emergencyContactPerson,
          added_by:mongoid
        })
 

@@ -251,7 +251,7 @@ function PreviewBooking() {
                 <div className='p-4 flex gap-2 items-center'>
                    <img src={issueDetails?.assignedEmployee?.profilePic?.filePath ? `${import.meta.env.VITE_APP_API_IMAGE_URL}/${issueDetails?.assignedEmployee?.profilePic?.filePath}` : EMPLOYEE} className='w-8 h-8'></img>
                    <div className='flex flex-col'>
-                     <span>{issueDetails.assignedEmployee.name}</span>
+                     <span>{issueDetails.assignedEmployee.firstName} {issueDetails.assignedEmployee.lastName}</span>
                      <span className='text-sm text-gray-500'>{issueDetails.assignedEmployee.email}</span>
                      <span className='text-sm text-gray-500'>{issueDetails.assignedEmployee.mobileno}</span>
                    </div>
