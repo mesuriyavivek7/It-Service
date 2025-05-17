@@ -102,7 +102,6 @@ const employeeSchema = new mongoose.Schema({
     },
     address2: {
         type: String,
-        required: true
     },
     area: {
         type: String,
