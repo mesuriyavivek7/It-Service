@@ -56,9 +56,9 @@ export const updateUser = async (req, res, next)=>{
 
        if(!user) return res.status(404).json({status:404,message:"User not found."})
 
-       const {name, mobileno} = req.body 
+       const {mobileno, email} = req.body 
 
-       if(mobileno!==user.mobileno){
+       if(mobileno && mobileno!==user.mobileno){
 
         const existUser = await LOGINMAPPING.findOne({mobileno})
 
@@ -68,7 +68,15 @@ export const updateUser = async (req, res, next)=>{
 
        }
 
-       const updatedUser = await USER.findByIdAndUpdate(userId,{$set:{name,mobileno}},{new:true})
+       if(email && email !== user.email){
+         const existUser = await LOGINMAPPING.findOne({email})
+
+         if(existUser) return res.status(409).json({message:"User is already exist with same email.",status:409})
+
+         await LOGINMAPPING.findOneAndUpdate({mongoid:userId},{$set:{email}})
+       }
+
+       const updatedUser = await USER.findByIdAndUpdate(userId,{$set:{...req.body}},{new:true})
 
        
        return res.status(200).json({status:200,data:updatedUser,message:"User details updated successfully."})
